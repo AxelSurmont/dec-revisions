@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0e27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>DEC Révisions v4</title>
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22DEC%20R%C3%A9visions%22%2C%22short_name%22%3A%22DEC%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0e27%22%2C%22theme_color%22%3A%22%230a0e27%22%7D">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e27;--bg2:#1a1f3a;--tx:#e2e8f0;--mu:#94a3b8;--dm:#64748b;--bl:#3b82f6;--b2:#60a5fa;--pu:#6366f1;--yl:#f59e0b;--gd:#fbbf24;--gn:#10b981;--rd:#ef4444;--pk:#f472b6;--cd:rgba(255,255,255,.04);--bd:rgba(255,255,255,.08)}
+body{min-height:100dvh;background:linear-gradient(135deg,var(--bg),var(--bg2),#0d1117);color:var(--tx);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+.ctn{max-width:520px;margin:0 auto;padding:20px 16px}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;-webkit-tap-highlight-color:transparent}
+input,textarea{font-family:inherit;outline:none}
+.tg{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;display:inline-block}
+.tg-ec{background:rgba(59,130,246,.15);color:var(--b2)}
+.tg-cac{background:rgba(245,158,11,.15);color:var(--gd)}
+.tg-qcm{background:rgba(16,185,129,.15);color:var(--gn)}
+.tg-qrc{background:rgba(168,85,247,.15);color:#a855f7}
+.bt{padding:15px 24px;border-radius:14px;font-size:15px;font-weight:600;width:100%;transition:transform .1s}
+.bt:active{transform:scale(.98)}
+.bt1{background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff}
+.bt2{background:linear-gradient(135deg,var(--yl),var(--rd));color:#fff}
+.bt3{background:var(--cd);color:var(--tx);border:1px solid var(--bd)}
+.bt4{background:linear-gradient(135deg,var(--gn),#059669);color:#fff}
+.cd{background:var(--cd);border-radius:16px;padding:20px;border:1px solid var(--bd)}
+.ch{padding:13px 14px;border-radius:11px;border:1px solid var(--bd);background:rgba(255,255,255,.03);color:var(--tx);font-size:13px;text-align:left;width:100%;line-height:1.4;transition:.15s}
+.ch.sel{border-color:var(--b2);background:rgba(96,165,250,.12);color:var(--b2)}
+.ch.ok{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.15);color:var(--gn);font-weight:600}
+.ch.wrong{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--rd)}
+.fi{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--bd);background:rgba(255,255,255,.06);color:var(--tx);font-size:14px}
+.fi:focus{border-color:var(--bl)}
+.fi::placeholder{color:var(--dm)}
+.kw{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;margin:2px}
+.kw-ok{background:rgba(16,185,129,.15);color:var(--gn);border:1px solid rgba(16,185,129,.3)}
+.kw-miss{background:rgba(239,68,68,.1);color:var(--rd);border:1px solid rgba(239,68,68,.2)}
+.tip{background:rgba(99,102,241,.08);border-radius:10px;padding:12px 14px;border:1px solid rgba(99,102,241,.15);margin-bottom:12px}
+.mn{font-family:'JetBrains Mono',monospace}
+.pb{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.pf{height:100%;border-radius:3px;transition:width .5s}
+.fade{animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.help-btn{padding:8px 14px;border-radius:9px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.1);color:#a855f7;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;margin-bottom:10px}
+.help-btn:hover{background:rgba(168,85,247,.2)}
+.v4badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:9px;font-weight:700;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;vertical-align:middle;margin-left:4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SUPABASE_URL='https://nxnlnmiccmhtmmphfcet.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54bmxubWljY21odG1tcGhmY2V0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzk0NzgsImV4cCI6MjA4OTc1NTQ3OH0.mDBh5WDTDLIKCQNz9Od5dQiA6vrDVT8TASrMrMxQfao';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+// ============================================================
+// QUESTIONS — v3 originals (30) + v4 new (85) = 115 total
+// ============================================================
+const QS=[
+// ═══════════════════════════════════════════════
+// V3 ORIGINAL QUESTIONS (30)
+// ═══════════════════════════════════════════════
+// EC - Exercice
+{id:"ec1",p:"EC",th:"Exercice",ty:"qcm",q:"Quel texte fondateur institue l'Ordre des experts-comptables ?",ch:["Décret n° 2012-432","Ordonnance n° 45-2138 du 19/09/1945","Loi PACTE 2019","Code de commerce Livre VIII"],a:1,ex:"L'ordonnance n° 45-2138 du 19/09/1945 porte institution de l'Ordre.",sr:"Ordonnance 45-2138"},
+{id:"ec2",p:"EC",th:"Exercice",ty:"qcm",q:"L'EC peut-il représenter son client devant les tribunaux ?",ch:["Oui, sans restriction","Oui, si lettre de mission","Non, mais il peut l'assister","Non, en aucun cas"],a:2,ex:"Art. 22 al. 5 : représentation interdite, assistance autorisée.",sr:"Art. 22 ord. 1945"},
+{id:"ec3",p:"EC",th:"Exercice",ty:"qcm",q:"Ratio d'encadrement maximal pour un EC ?",ch:["10 salariés","12 salariés","15 salariés","20 salariés"],a:2,ex:"15 salariés comptables par professionnel inscrit.",sr:"Décret 2012-432"},
+{id:"ec4",p:"EC",th:"Exercice",ty:"qrc",q:"L'expert-comptable peut-il donner des consultations juridiques ? Si oui, dans quelles conditions ?",a:"Oui, à titre accessoire et si directement liées aux travaux comptables ou pour un client bénéficiant d'une mission comptable permanente (art. 22 al. 8 et 10 ord. 1945). Elles ne doivent pas constituer l'objet principal de l'activité.",sr:"Art. 22 ord. 1945",kw:["accessoire","liées aux travaux comptables","article 22","ordonnance 1945","objet principal"],tip:"Précisez le caractère accessoire ET le lien obligatoire avec la mission comptable. Citez l'article."},
+{id:"ec5",p:"EC",th:"Exercice",ty:"qcm",q:"Fonction incompatible avec la profession d'EC ?",ch:["Conseil patrimoine (accessoire)","Tiers payant député UE","Assister clients devant tribunaux","Représenter clients devant tribunaux"],a:3,ex:"Représentation interdite (art. 22 al. 5). Assistance autorisée.",sr:"Art. 22 ord. 1945"},
+// EC - Déontologie
+{id:"ec6",p:"EC",th:"Déontologie",ty:"qcm",q:"La lettre de mission est-elle obligatoire pour l'EC ?",ch:["Oui, toujours","Oui, sauf missions accessoires","Non, recommandée","Non, sauf audit"],a:0,ex:"Art. 151 : obligatoire avant toute intervention.",sr:"Art. 151 décret 2012-432"},
+{id:"ec7",p:"EC",th:"Déontologie",ty:"qcm",q:"Honoraires au succès pour optimisation fiscale ?",ch:["Oui, libre","Non, jamais","Non, car assiette fiscale","Oui, si accord écrit"],a:2,ex:"Missions touchant l'assiette fiscale : pas de rémunération au succès.",sr:"Art. 158 décret 2012-432"},
+{id:"ec8",p:"EC",th:"Déontologie",ty:"qrc",q:"Quelles sont les obligations de l'EC successeur en matière de confraternité ?",a:"S'assurer que les honoraires du prédécesseur sont réglés et l'informer de sa nomination (art. 163). Suggérer la conciliation ou l'arbitrage en cas de contestation.",sr:"Art. 163 décret 2012-432",kw:["honoraires","prédécesseur","réglés","informer","nomination","article 163","conciliation"],tip:"Deux obligations distinctes : vérification du paiement des honoraires + information du confrère. Citez l'article 163."},
+{id:"ec9",p:"EC",th:"Déontologie",ty:"qcm",q:"Action de promotion NON autorisée pour un EC ?",ch:["Référencement société non inscrite","Site notation clients","Parrainage par clients","Publicité « premier réseau »"],a:3,ex:"Art. 152 : publicité sans élément comparatif. « Premier réseau » = comparatif.",sr:"Art. 152 décret 2012-432"},
+{id:"ec10",p:"EC",th:"Déontologie",ty:"qcm",q:"Droit de rétention sur comptes annuels si indemnité rupture impayée ?",ch:["Oui","Oui si lettre de mission","Non","Selon circonstances"],a:2,ex:"Droit de rétention limité aux documents liés aux travaux effectués, pas à l'indemnité de rupture.",sr:"CNOEC 2025 p.230"},
+{id:"ec11",p:"EC",th:"Déontologie",ty:"qrc",q:"Dans quelle situation l'EC peut-il opposer le secret professionnel ?",a:"Lors d'une audition pénale en qualité de témoin ou suspect libre (art. 109 CPP). L'EC doit se soumettre à la convocation mais peut refuser de témoigner sur les éléments couverts par le secret.",sr:"CNOEC Secret pro 2021",kw:["audition pénale","témoin","suspect libre","article 109","refuser","témoigner","secret"],tip:"Distinguez l'obligation de se présenter (pas de choix) du droit de refuser de témoigner sur les éléments couverts. Citez l'art. 109 CPP."},
+// EC - Contrôle qualité
+{id:"ec12",p:"EC",th:"Qualité",ty:"qcm",q:"Les contrôles qualité EC sont assurés par :",ch:["EC désignés par Conseils régionaux","EC ayant fait acte de candidature","EC inscrits < 5 ans","Salariés Conseil national"],a:1,ex:"Acte de candidature auprès du CR.",sr:"CNOEC CQ 2018"},
+{id:"ec13",p:"EC",th:"Qualité",ty:"qcm",q:"Niveaux de vigilance NPLAB anti-blanchiment ?",ch:["Faible et accrue","Allégée et standard","Standard et renforcée","Standard et accentuée"],a:2,ex:"Standard (risque faible/moyen) et renforcée (risque élevé).",sr:"NPLAB §21"},
+// EC - Responsabilité
+{id:"ec14",p:"EC",th:"Responsabilité",ty:"qcm",q:"Sanction disciplinaire EC inexistante :",ch:["Remontrance avec inscription","Blâme avec inscription","Suspension avec sursis","Radiation du Tableau"],a:0,ex:"« Remontrance » n'existe pas. Sanctions : réprimande, blâme, suspension, radiation.",sr:"Art. 53 ord. 1945"},
+{id:"ec15",p:"EC",th:"Responsabilité",ty:"qrc",q:"Quelle est la peine pour exercice illégal de la profession d'EC ?",a:"Délit puni des peines prévues aux articles 433-17 et 433-25 du code pénal, sans préjudice des sanctions disciplinaires.",sr:"Art. 20 ord. 1945",kw:["délit","433-17","433-25","code pénal","sanctions disciplinaires"],tip:"Citez les articles du code pénal applicables et mentionnez le cumul possible avec les sanctions disciplinaires."},
+// CAC - Exercice
+{id:"cac1",p:"CAC",th:"Exercice",ty:"qcm",q:"Durée du mandat d'un CAC ?",ch:["3 exercices","4 exercices","6 exercices","6 exercices ou 3 (ALPE)"],a:3,ex:"6 exercices (art. L. 821-44), 3 pour ALPE (NEP 911).",sr:"Art. L. 821-44"},
+{id:"cac2",p:"CAC",th:"Exercice",ty:"qcm",q:"Seuils nomination obligatoire CAC (PACTE) ?",ch:["3M€, 6M€, 30 sal.","4M€, 8M€, 50 sal.","5M€, 10M€, 50 sal.","8M€, 16M€, 50 sal."],a:2,ex:"2/3 dépassés : 5M€ bilan, 10M€ CA, 50 salariés.",sr:"Art. D. 821-171"},
+{id:"cac3",p:"CAC",th:"Exercice",ty:"qcm",q:"Institution NE pouvant PAS demander une NEP ?",ch:["Ministère Justice","AMF","CRCC","Conseil norm. comptes publics"],a:2,ex:"CRCC absente de la liste art. L. 820-3.",sr:"Art. L. 820-3"},
+{id:"cac4",p:"CAC",th:"Exercice",ty:"qcm",q:"Chiffre NE concernant PAS le CN de la CNCC ?",ch:["Soixante (membres)","Dix-sept (présidents CRCC)","Quatre (durée mandat)","Vingt-deux"],a:3,ex:"60 membres, 4 ans, 17 présidents CRCC. 22 n'apparaît nulle part.",sr:"Art. D. 821-14"},
+{id:"cac5",p:"CAC",th:"Exercice",ty:"qrc",q:"Comment fonctionne la procédure de dérogation au barème d'heures du CAC ?",a:"Saisine du président CRCC → en cas de désaccord, recours devant le président CNCC → puis bureau H2A.",sr:"Fiche CNCC n°1",kw:["président CRCC","saisine","désaccord","président CNCC","recours","bureau","H2A"],tip:"3 étapes hiérarchiques. L'erreur classique est d'oublier l'étape intermédiaire (président CNCC) et d'aller directement à la H2A."},
+// CAC - Déontologie
+{id:"cac6",p:"CAC",th:"Déontologie",ty:"qcm",q:"Qualité NON mentionnée art. 3 code déonto CAC ?",ch:["Honnêteté","Droiture","Sincérité","Probité"],a:2,ex:"Art. 3 : honnêteté, droiture, probité. Sincérité absente — piège classique.",sr:"Art. 3 code déonto CAC"},
+{id:"cac7",p:"CAC",th:"Déontologie",ty:"qcm",q:"Sollicitation personnalisée du CAC autorisée par ?",ch:["Aucun moyen (interdit)","Tout moyen","Envoi postal ou email uniquement","Y compris téléphone"],a:2,ex:"Art. 16 : postal/email uniquement. Démarchage physique/téléphone/SMS exclus.",sr:"Art. 16 code déonto CAC"},
+{id:"cac8",p:"CAC",th:"Déontologie",ty:"qcm",q:"L'approche risque/sauvegarde (art. 19) concerne :",ch:["Méthode d'audit","Services interdits remplacés (non-EIP)","Assurance RC obligatoire","Révélation au procureur"],a:1,ex:"Non-EIP : identifier risques sur indépendance + sauvegardes au lieu d'une liste d'interdits.",sr:"Art. 19 code déonto CAC"},
+{id:"cac9",p:"CAC",th:"Déontologie",ty:"qcm",q:"Disposition absente du Titre I code déonto CAC ?",ch:["Principes fondamentaux","Monopole autres professions","Collaborateurs externes","Honoraires proportionnels autorisés"],a:3,ex:"Honoraires proportionnels/conditionnels interdits (art. 12-13).",sr:"Code déonto CAC, Titre I"},
+{id:"cac10",p:"CAC",th:"Déontologie",ty:"qrc",q:"En cas de litige sur les honoraires portant sur des prestations du CAC, quelle juridiction saisir ?",a:"Le tribunal compétent (droit commun). La H2A n'est plus compétente, contrairement à l'ancien H3C.",sr:"Fiche CNCC n°2",kw:["tribunal","compétent","droit commun","H2A","plus compétente","H3C"],tip:"Le piège est de répondre H2A. Insistez sur le changement par rapport à l'ancien système H3C."},
+// CAC - Contrôle qualité
+{id:"cac11",p:"CAC",th:"Qualité",ty:"qcm",q:"Autorité de contrôle qualité des CAC ?",ch:["CRCC","CNCC","H2A","AMF"],a:2,ex:"H2A supervise le contrôle qualité EIP et non-EIP.",sr:"Art. L. 820-2"},
+{id:"cac12",p:"CAC",th:"Qualité",ty:"qcm",q:"Personne hors champ Commission sanctions H2A ?",ch:["CAC","Contrôleur pays tiers","Membre comité EIP","Expert-comptable"],a:3,ex:"L'EC ne relève PAS de la Commission des sanctions H2A.",sr:"Art. L. 820-2 / L. 821-70"},
+// CAC - Responsabilité
+{id:"cac13",p:"CAC",th:"Responsabilité",ty:"qcm",q:"Sanction disciplinaire NON applicable au CAC ?",ch:["Emprisonnement","Sanction pécuniaire","Blâme","Radiation"],a:0,ex:"Emprisonnement = pénal. 8 sanctions disciplinaires (L. 821-71).",sr:"Art. L. 821-71"},
+{id:"cac14",p:"CAC",th:"Responsabilité",ty:"qcm",q:"Procédure disciplinaire inexistante pour le CAC ?",ch:["Composition administrative","Procédure simplifiée","Droit commun","Comparution immédiate"],a:3,ex:"3 procédures : classique, simplifiée, composition administrative.",sr:"Fiche CNCC n°4"},
+{id:"cac15",p:"CAC",th:"Responsabilité",ty:"qrc",q:"Montant max sanction pécuniaire CAC personne physique ?",a:"250 000 € maximum (art. L. 821-71). Prononcée par la Commission des sanctions H2A.",sr:"Art. L. 821-71",kw:["250 000","Commission des sanctions","H2A","article L. 821-71","disciplinaire"],tip:"Donnez le montant exact, précisez que c'est disciplinaire (pas pénal) et l'organe qui prononce."},
+
+// ═══════════════════════════════════════════════
+// V4 NEW QUESTIONS (85) — Sources: Réglementation juil. 2025, Code déontologie janv. 2026, Référentiel normatif août 2025
+// ═══════════════════════════════════════════════
+
+// ── EXERCICE DE LA PROFESSION (25 questions) ──
+
+{id:"v4e1",p:"EC",th:"Exercice",ty:"qcm",q:"Quelles formes juridiques sont INTERDITES pour exercer l'expertise comptable ?",ch:["SARL et EURL","SAS et SA","SNC et société en commandite","Société civile et SCOP"],a:2,ex:"Art. 7 ord. 1945 : toutes formes sauf celles conférant la qualité de commerçant (SNC, commandite).",sr:"Art. 7 ord. 1945"},
+{id:"v4e2",p:"EC",th:"Exercice",ty:"qcm",q:"Quelle proportion des droits de vote doit être détenue par des EC dans une SEC ?",ch:["La majorité simple (50%+1)","Plus de deux tiers","Au moins trois quarts","La totalité"],a:1,ex:"Art. 7-I : les EC et personnes autorisées doivent détenir plus de 2/3 des droits de vote.",sr:"Art. 7-I ord. 1945"},
+{id:"v4e3",p:"EC",th:"Exercice",ty:"qrc",q:"Un expert-comptable de nationalité étrangère (hors UE/EEE), inscrit au Tableau français, peut-il créer une société d'expertise comptable en France ?",a:"Oui, depuis l'ordonnance n°2023-77 du 8 février 2023, tout EC inscrit au Tableau français peut créer une SEC quelle que soit sa nationalité, en vertu du principe d'égalité devant la loi et de la liberté d'entreprendre.",sr:"Art. 7 ord. 1945 modifié par Ord. 2023-77",kw:["oui","ordonnance 2023-77","8 février 2023","nationalité","égalité","liberté d'entreprendre","tableau"],tip:"Rappelez la modification législative de 2023 qui a corrigé l'omission de l'ordonnance de 1945. Citez les principes constitutionnels."},
+{id:"v4e4",p:"EC",th:"Exercice",ty:"qcm",q:"Une personne morale peut être représentant légal d'une SEC sous forme de :",ch:["SARL uniquement","SAS ou société civile","SA uniquement","Toute forme juridique"],a:1,ex:"Depuis l'ord. 2023-77, une SEC ou SPEC peut diriger une SAS ou société civile d'EC.",sr:"Art. 7 ord. 1945"},
+{id:"v4e5",p:"EC",th:"Exercice",ty:"qcm",q:"Nombre minimum d'adhérents pour inscrire une AGC au tableau de l'Ordre ?",ch:["100 adhérents","200 adhérents","300 adhérents","500 adhérents"],a:2,ex:"Art. 7 ter : aucune AGC ne peut être inscrite avec moins de 300 adhérents.",sr:"Art. 7 ter ord. 1945"},
+{id:"v4e6",p:"EC",th:"Exercice",ty:"qcm",q:"L'expert-comptable en entreprise (art. 13 ord. 1945) peut-il accomplir les missions des deux premiers alinéas de l'article 2 ?",ch:["Non, jamais","Oui, sans restriction","Oui, uniquement pour son employeur","Oui, pour les filiales de son employeur"],a:2,ex:"Art. 13-III : uniquement au bénéfice de l'entité juridique qui l'emploie.",sr:"Art. 13 ord. 1945"},
+{id:"v4e7",p:"EC",th:"Exercice",ty:"qrc",q:"Qu'est-ce que le « mandat implicite » introduit par la loi PACTE et quelles en sont les limites ?",a:"Le mandat implicite est une présomption simple de mandat qui permet à l'EC d'agir auprès de l'administration fiscale et des organismes de sécurité sociale sans produire de mandat signé pour chaque démarche. Exception : les identifiants fiscaux des particuliers (création de compte, mot de passe, adresse mail) nécessitent toujours un mandat exprès.",sr:"Art. 151 décret 2012-432 / Loi PACTE 2019",kw:["présomption simple","administration fiscale","sécurité sociale","mandat signé","particuliers","identifiants fiscaux","exception"],tip:"Distinguez bien la règle (présomption simple pour fiscal/social) de l'exception (identifiants fiscaux des particuliers). Mentionnez que la lettre de mission reste obligatoire."},
+{id:"v4e8",p:"EC",th:"Exercice",ty:"qcm",q:"Quel statut interdit à un avocat de créer un cabinet d'EC même s'il est diplômé DEC ?",ch:["Loi PACTE 2019","Art. 21 décret n°2023-552","Art. 7 ord. 1945","Code de commerce"],a:1,ex:"Le décret 2023-552 interdit aux avocats d'exercer toute autre profession, y compris l'EC.",sr:"Décret n°2023-552 du 30/06/2023"},
+{id:"v4e9",p:"EC",th:"Exercice",ty:"qcm",q:"Les SCP (Sociétés Civiles Professionnelles) peuvent-elles être utilisées par les EC ?",ch:["Oui, librement","Oui, avec autorisation du CR","Non, faute de décret d'application","Non, car forme commerciale"],a:2,ex:"Pas de décret d'application pour la profession d'EC concernant les SCP.",sr:"Guide profession EC 2025"},
+{id:"v4e10",p:"EC",th:"Exercice",ty:"qcm",q:"La détention du capital des SEC est-elle réglementée ?",ch:["Oui, mêmes règles que les droits de vote","Non, seuls les droits de vote le sont","Oui, au moins 50% par des EC","Non, aucune règle"],a:1,ex:"Art. 7 ord. 1945 : pas de disposition sur le capital, seuls les droits de vote (2/3) sont réglementés.",sr:"Art. 7 ord. 1945"},
+{id:"v4e11",p:"EC",th:"Exercice",ty:"qrc",q:"Un expert-comptable peut-il investir dans une start-up cliente de son cabinet ? Quelles précautions prendre ?",a:"Oui, si l'investissement ne constitue pas des intérêts substantiels (pas de capacité d'interférence dans le processus de décision, comme un droit de blocage). Des mesures de sauvegarde doivent être mises en place : suivi par un autre EC du cabinet (code éthique IESBA).",sr:"Art. 22 al. 5 ord. 1945 / Code éthique IESBA",kw:["intérêts substantiels","blocage","mesures de sauvegarde","IESBA","autre expert-comptable","indépendance"],tip:"Distinguez l'investissement modéré des intérêts substantiels (= capacité d'interférer). Mentionnez le code IESBA et les mesures de sauvegarde."},
+{id:"v4e12",p:"EC",th:"Exercice",ty:"qcm",q:"Quelle mission est interdite à l'EC au sein de sa structure d'exercice inscrite ?",ch:["Recouvrement amiable de créances","Représentation fiscale (répondant)","Mandataire fiscal","Conseil en investissements financiers"],a:1,ex:"Le représentant fiscal est garant du paiement de l'impôt = assimilé à agence d'affaires, interdit.",sr:"Art. 22 al. 5 ord. 1945"},
+{id:"v4e13",p:"EC",th:"Exercice",ty:"qcm",q:"Depuis quand les activités commerciales accessoires sont-elles effectives pour les EC ?",ch:["6 août 2015 (loi Macron)","22 mai 2019 (loi PACTE)","3 mai 2021 (arrêté agrément)","1er janvier 2020"],a:2,ex:"Norme agréée par arrêté du 12 mars 2021, entrée en vigueur le 3 mai 2021.",sr:"Arrêté 12/03/2021"},
+{id:"v4e14",p:"EC",th:"Exercice",ty:"qcm",q:"L'EC peut-il exercer l'activité d'agent immobilier ?",ch:["Oui, à titre accessoire","Oui, via une filiale non inscrite","Non, car agence d'affaires interdite","Non, sauf autorisation du CR"],a:2,ex:"Agent immobilier = agence d'affaires (art. 22 al. 5). Activité limitée au conseil.",sr:"Art. 22 ord. 1945 / Loi Hoguet"},
+{id:"v4e15",p:"EC",th:"Exercice",ty:"qrc",q:"Quelles sont les conditions pour qu'un EC puisse faire de l'intermédiation en assurances dans sa structure d'exercice ?",a:"L'EC ne peut exercer que comme mandataire d'intermédiaire d'assurance (pas courtier ni agent général). Il doit : s'inscrire à l'ORIAS, souscrire une assurance RCP, se faire rémunérer sous forme d'honoraires par ses clients (pas de commissions), et ne pas réaliser de prestations d'encaissement.",sr:"Art. L 511-1 Code des assurances / Art. 24 ord. 1945",kw:["mandataire d'intermédiaire","ORIAS","honoraires","pas de commissions","encaissement","assurance RCP"],tip:"Le piège est de confondre avec le courtier (commerçant = interdit). Détaillez les 4 conditions cumulatives."},
+{id:"v4e16",p:"EC",th:"Exercice",ty:"qcm",q:"Le seuil de participation dans une société non inscrite déclenchant le contrôle du CR est de :",ch:["5% des droits de vote","10% des droits de vote ou bénéfices","25% du capital","Toute participation"],a:1,ex:"Art. 601 RI : participation > 10% des droits de vote ou des bénéfices soumise au contrôle.",sr:"Art. 601 et s. RI de l'Ordre"},
+{id:"v4e17",p:"EC",th:"Exercice",ty:"qcm",q:"Quel texte encadre les SPE (sociétés pluriprofessionnelles d'exercice) depuis le 1er septembre 2024 ?",ch:["Loi n°90-1258 du 31/12/1990","Ordonnance n°2023-77 du 8/02/2023","Loi PACTE 2019","Décret 2012-432"],a:1,ex:"L'ordonnance de 2023 a remplacé la loi de 1990, abrogée depuis le 1er sept. 2024.",sr:"Ord. n°2023-77"},
+{id:"v4e18",p:"EC",th:"Exercice",ty:"qcm",q:"Dans une SPE, la comptabilité doit être :",ch:["Unique pour toute la société","Distincte pour chaque profession","Distincte seulement si plus de 2 professions","Au choix des associés"],a:1,ex:"Les SPE doivent établir une comptabilité distincte pour chacune des professions exercées.",sr:"Ord. n°2023-77 / Décret 2025-131"},
+{id:"v4e19",p:"EC",th:"Exercice",ty:"qcm",q:"L'EC peut-il être rémunéré sous forme de commissions pour ses activités commerciales accessoires ?",ch:["Oui, dans le cadre de la norme","Non, exclusivement des honoraires","Oui, si accord écrit du client","Oui, pour les actes d'intermédiaire"],a:1,ex:"Art. 24 ord. 1945 : honoraires exclusifs de toute autre rémunération, même pour activités commerciales.",sr:"Art. 24 ord. 1945"},
+{id:"v4e20",p:"EC",th:"Exercice",ty:"qrc",q:"Le cabinet d'expertise comptable peut-il séquestrer des fonds pour le compte de son client ?",a:"Non. Depuis la loi PACTE 2019, seuls le recouvrement amiable de créances et le mandat de paiement sont autorisés. Le paiement doit se faire via les comptes bancaires du client (codes d'accès spécifiques fournis par le client). L'EC ne peut pas encaisser de fonds sur ses propres comptes.",sr:"Art. 22 al. 4 ord. 1945 / Art. 151-3 décret 2012",kw:["non","recouvrement amiable","mandat de paiement","comptes bancaires du client","codes d'accès","pas encaisser"],tip:"Précisez les deux seules missions autorisées (mandat de paiement + recouvrement amiable) et que les fonds transitent uniquement par les comptes du client."},
+{id:"v4e21",p:"EC",th:"Exercice",ty:"qcm",q:"L'EC est dispensé d'immatriculation ORIAS pour le CIF (conseil en investissements financiers) quand :",ch:["Jamais, l'ORIAS est toujours obligatoire","La mission est accessoire de l'activité EC","Le client est un particulier","Les montants sont inférieurs à 15 000 €"],a:1,ex:"Art. L 531-2 g CMF : dispensé si service d'investissement à titre accessoire dans le cadre d'une activité réglementée.",sr:"Art. L 531-2 / L 541-1 CMF"},
+{id:"v4e22",p:"EC",th:"Exercice",ty:"qcm",q:"Les honoraires de succès sont interdits pour les missions :",ch:["De conseil en organisation","D'accompagnement au financement","Relevant de l'assiette fiscale ou sociale","D'aide au recrutement"],a:2,ex:"Art. 24 ord. 1945 modifié par PACTE : interdit pour missions touchant l'assiette fiscale/sociale.",sr:"Art. 24 ord. 1945 / Art. 158 décret"},
+{id:"v4e23",p:"EC",th:"Exercice",ty:"qcm",q:"La mission d'établissement des bulletins de paie peut-elle être réalisée sans mission comptable ?",ch:["Non, mission comptable obligatoire","Oui, si accessoire de l'activité du cabinet","Non, c'est un acte juridique","Oui, uniquement pour les AGC"],a:1,ex:"Bulletins de paie = travaux administratifs/techniques domaine social (art. 22 al. 8-9), pas d'acte sous seing privé.",sr:"Art. 22 al. 8-9 ord. 1945"},
+{id:"v4e24",p:"EC",th:"Exercice",ty:"qcm",q:"Qui exerce la tutelle sur l'Ordre des experts-comptables ?",ch:["Le ministère de la Justice","Le ministère de l'Économie","Le Premier ministre","La Cour des comptes"],a:1,ex:"Art. 56 ord. 1945 : ministre chargé de l'économie, représenté par un Commissaire du Gouvernement.",sr:"Art. 56 ord. 1945"},
+{id:"v4e25",p:"EC",th:"Exercice",ty:"qrc",q:"Un cabinet d'EC peut-il créer une filiale pour réaliser du suivi juridique de ses clients EC ?",a:"Non, si le suivi juridique implique des consultations juridiques ou la rédaction d'actes sous seing privé. Ces missions ne peuvent être réalisées que dans une structure inscrite à l'Ordre, à titre accessoire, et uniquement pour un client bénéficiant d'une mission comptable permanente ou habituelle, ou directement lié aux travaux comptables.",sr:"Art. 22 al. 8 et 10 ord. 1945",kw:["non","consultations juridiques","actes sous seing privé","structure inscrite","accessoire","mission comptable","permanente"],tip:"La clé est que la dérogation pour les prestations juridiques ne s'applique qu'au sein de structures inscrites à l'Ordre."},
+
+// ── DÉONTOLOGIE (25 questions) ──
+
+{id:"v4d1",p:"EC",th:"Déontologie",ty:"qcm",q:"Le code de déontologie EC est contenu dans quel texte ?",ch:["Ordonnance de 1945","Décret n°2012-432 du 30/03/2012","Règlement intérieur de l'Ordre","Arrêté du 6 mars 2024"],a:1,ex:"Le code de déontologie constitue le chapitre II du titre III du décret 2012-432 (art. 141 à 169).",sr:"Décret 2012-432"},
+{id:"v4d2",p:"EC",th:"Déontologie",ty:"qcm",q:"Dans quel délai l'EC doit-il prêter serment après inscription au tableau ?",ch:["1 mois","3 mois","6 mois","12 mois"],a:2,ex:"Art. 143 : dans les six mois de l'inscription au tableau.",sr:"Art. 143 décret 2012-432"},
+{id:"v4d3",p:"EC",th:"Déontologie",ty:"qrc",q:"Quelle est la formule du serment de l'expert-comptable ?",a:"« Je jure d'exercer ma profession avec conscience et probité, de respecter et faire respecter les lois dans mes travaux. » Prestation devant le conseil régional de l'ordre.",sr:"Art. 143 décret 2012-432",kw:["conscience","probité","respecter","lois","travaux","conseil régional"],tip:"Citez la formule exacte et précisez devant quelle instance le serment est prêté."},
+{id:"v4d4",p:"EC",th:"Déontologie",ty:"qcm",q:"L'article 145 du code de déontologie impose à l'EC de ne jamais se trouver en situation de :",ch:["Dépendance financière","Conflit d'intérêts","Rémunération au succès","Pluriactivité"],a:1,ex:"Art. 145 al. 5 : ne jamais se trouver en situation de conflit d'intérêts.",sr:"Art. 145 décret 2012-432"},
+{id:"v4d5",p:"EC",th:"Déontologie",ty:"qcm",q:"L'article 147 du code de déontologie porte sur :",ch:["Le devoir de conseil","Le devoir de discrétion","Le secret professionnel","La formation continue"],a:1,ex:"Art. 147 : devoir de discrétion, sans préjudice du secret professionnel (art. 21 ord.).",sr:"Art. 147 décret 2012-432"},
+{id:"v4d6",p:"EC",th:"Déontologie",ty:"qrc",q:"Quelles sont les conditions de démarchage autorisées pour un expert-comptable depuis 2014 ?",a:"Le démarchage est autorisé depuis le décret du 18 août 2014 modifiant l'art. 152, dans des conditions compatibles avec les règles déontologiques. Les limites : respect de l'indépendance, dignité, honneur, secret professionnel, loyauté envers les clients et confrères (art. 161 : pas de démarche susceptible de nuire aux confrères).",sr:"Art. 152 décret 2012-432 / Décret 18/08/2014",kw:["autorisé","2014","article 152","indépendance","dignité","secret professionnel","loyauté","confrères"],tip:"Rappelez l'arrêt CJUE 2011 qui a annulé l'interdiction totale, puis le nouvel encadrement de 2014. Citez les limites."},
+{id:"v4d7",p:"EC",th:"Déontologie",ty:"qcm",q:"La publicité de l'EC doit être exempte de tout élément :",ch:["Tarifaire","Comparatif","Numérique","Technique"],a:1,ex:"Art. 152 : exempt de tout élément comparatif, décent et empreint de retenue.",sr:"Art. 152 décret 2012-432"},
+{id:"v4d8",p:"EC",th:"Déontologie",ty:"qcm",q:"L'EC qui fait l'objet de poursuites judiciaires liées à sa profession doit en informer :",ch:["Le procureur de la République","Le président du conseil régional","Le Conseil national","Le commissaire du Gouvernement"],a:1,ex:"Art. 167 : informer sans délai le président du CR de la circonscription d'inscription.",sr:"Art. 167 décret 2012-432"},
+{id:"v4d9",p:"EC",th:"Déontologie",ty:"qcm",q:"En cas de différend entre EC, la conciliation est :",ch:["Facultative","Obligatoire avant toute plainte","Obligatoire seulement pour les honoraires","Décidée par le Conseil national"],a:1,ex:"Art. 161 modifié par décret 2025-506 : conciliation ou arbitrage obligatoire avant plainte, sous peine d'irrecevabilité.",sr:"Art. 161 décret 2012-432 (mod. 2025)"},
+{id:"v4d10",p:"EC",th:"Déontologie",ty:"qrc",q:"Quelles sont les mentions autorisées sur les imprimés professionnels de l'EC (art. 154) ?",a:"Nom, prénoms, raison sociale, adresses, téléphone, email ; titres et diplômes ; spécialisations issues de la formation ou de l'expérience ; nom de l'assureur et n° de police ; référence à une norme de certification ; qualité d'expert judiciaire ou CAC ; distinctions honorifiques ; appartenance à un réseau professionnel.",sr:"Art. 154 décret 2012-432",kw:["diplômes","spécialisations","assureur","police","certification","expert judiciaire","distinctions","réseau"],tip:"Listez les 8 catégories de mentions autorisées par l'article 154."},
+{id:"v4d11",p:"EC",th:"Déontologie",ty:"qcm",q:"L'EC peut mentionner ses spécialisations sur ses imprimés depuis :",ch:["La loi PACTE 2019","Le décret du 30/12/2022","L'arrêté du 6 mars 2024","Toujours"],a:1,ex:"Décret 2022-1732 : modification art. 154, spécialisations issues formation ou expérience sans reconnaissance préalable de l'Ordre.",sr:"Art. 154 / Décret 2022-1732"},
+{id:"v4d12",p:"EC",th:"Déontologie",ty:"qcm",q:"Pour justifier une spécialisation, l'EC doit prouver une formation d'au moins :",ch:["40 heures sur 5 ans","80 heures sur 3 ans","120 heures sur 5 ans","200 heures sur 10 ans"],a:2,ex:"Art. 306 RI : 120h sur 5 ans, ou 40h formation + animation, ou 10% de l'activité annuelle.",sr:"Art. 306 RI de l'Ordre"},
+{id:"v4d13",p:"EC",th:"Déontologie",ty:"qcm",q:"Le délai pour le président du CR pour engager une conciliation entre EC est de :",ch:["1 mois","2 mois","3 mois","6 mois"],a:1,ex:"Art. 161 modifié 2025 : 2 mois pour engager, 4 mois pour mener à terme.",sr:"Art. 161 décret 2012-432"},
+{id:"v4d14",p:"EC",th:"Déontologie",ty:"qcm",q:"L'article 150 oblige l'EC à apprécier avant d'accepter une mission :",ch:["Les honoraires du prédécesseur","La possibilité de l'effectuer conformément aux textes","La taille de l'entreprise cliente","L'avis du conseil régional"],a:1,ex:"Art. 150 : apprécier la possibilité d'effectuer la mission conformément aux textes et normes.",sr:"Art. 150 décret 2012-432"},
+{id:"v4d15",p:"EC",th:"Déontologie",ty:"qrc",q:"L'article 146 du code de déontologie porte sur l'indépendance. Quelles obligations en découlent ?",a:"L'EC doit éviter toute situation qui pourrait faire présumer d'un manque d'indépendance. Il doit être libre de tout lien extérieur d'ordre personnel, professionnel ou financier qui pourrait être interprété comme une entrave à son intégrité ou à son objectivité.",sr:"Art. 146 décret 2012-432",kw:["indépendance","présumer","libre","lien extérieur","personnel","professionnel","financier","intégrité","objectivité"],tip:"Citez les deux dimensions de l'article 146 : éviter les apparences ET être libre de tout lien."},
+{id:"v4d16",p:"EC",th:"Déontologie",ty:"qcm",q:"L'article 157 impose à l'EC de dénoncer le contrat en cas de :",ch:["Retard de paiement des honoraires","Conflit d'intérêts ou atteinte à l'indépendance","Changement de dirigeant du client","Déménagement du client"],a:1,ex:"Art. 157 : obligation de dénoncer le contrat si conflit d'intérêts ou atteinte à l'indépendance.",sr:"Art. 157 décret 2012-432"},
+{id:"v4d17",p:"EC",th:"Déontologie",ty:"qcm",q:"Le remplacement provisoire d'un EC décédé est une mission de confraternité :",ch:["Rémunérée au tarif horaire","Gratuite (sauf importance de la mission)","Facturée au CR","Payée par l'assurance du défunt"],a:1,ex:"Art. 166 : mission gratuite, sauf indemnité si l'importance le justifie, soumise à l'agrément du CR.",sr:"Art. 166 décret 2012-432"},
+{id:"v4d18",p:"EC",th:"Déontologie",ty:"qcm",q:"L'indépendance selon le code IESBA recouvre :",ch:["Indépendance financière et morale","Indépendance d'esprit et en apparence","Indépendance technique et juridique","Indépendance fonctionnelle et hiérarchique"],a:1,ex:"Code IESBA : indépendance d'esprit (jugement non affecté) et en apparence (tiers raisonnable).",sr:"Code éthique IESBA"},
+{id:"v4d19",p:"EC",th:"Déontologie",ty:"qcm",q:"L'arbitrage du président du CR entre l'EC et son client est soumis aux règles :",ch:["Du code de commerce","Du code de procédure civile (art. 1451 et suivants)","Du règlement intérieur de l'Ordre","Du code du travail"],a:1,ex:"Art. 160 : arbitrage soumis aux règles des articles 1451 et suivants du code de procédure civile.",sr:"Art. 160 décret 2012-432"},
+{id:"v4d20",p:"EC",th:"Déontologie",ty:"qrc",q:"Quels motifs permettent à l'EC d'interrompre sa mission avant son terme normal (art. 156) ?",a:"Des motifs justes et raisonnables, tels que la perte de confiance manifestée par le client ou la méconnaissance par celui-ci d'une clause substantielle du contrat. L'EC doit s'efforcer de ne pas porter préjudice au client.",sr:"Art. 156 décret 2012-432",kw:["motifs justes","raisonnables","perte de confiance","clause substantielle","contrat","préjudice"],tip:"Citez les deux exemples donnés par l'article 156 et mentionnez l'obligation de ne pas nuire au client."},
+{id:"v4d21",p:"EC",th:"Déontologie",ty:"qcm",q:"L'article 148 impose à l'EC de s'assurer que ses collaborateurs :",ch:["Sont tous diplômés DEC","Ont une compétence appropriée à la complexité des travaux","Ont au moins 3 ans d'expérience","Sont inscrits au tableau de l'Ordre"],a:1,ex:"Art. 148 : compétence appropriée, critères de qualité, respect des règles déontologiques.",sr:"Art. 148 décret 2012-432"},
+{id:"v4d22",p:"EC",th:"Déontologie",ty:"qcm",q:"Le mandat spécial pour le paiement des dettes des clients (art. 151-3) impose que l'opération soit réalisée par :",ch:["Chèque du cabinet","Virement électronique via les comptes du client","Prélèvement automatique","Espèces"],a:1,ex:"Art. 151-3 : virement électronique grâce aux codes d'accès spécifiques aux comptes bancaires en ligne du client.",sr:"Art. 151-3 décret 2012-432"},
+{id:"v4d23",p:"EC",th:"Déontologie",ty:"qcm",q:"Les membres élus des conseils de l'Ordre doivent s'abstenir de tout acte visant à :",ch:["Critiquer les normes professionnelles","Entraver le fonctionnement des organismes élus","Participer à des congrès internationaux","Communiquer avec la presse"],a:1,ex:"Art. 169 : s'abstenir d'entraver le fonctionnement ou d'empêcher la libre expression.",sr:"Art. 169 décret 2012-432"},
+{id:"v4d24",p:"EC",th:"Déontologie",ty:"qcm",q:"L'EC envisageant une rétention de travaux pour impayé doit d'abord informer :",ch:["Le client par LRAR","Le président du conseil régional","Le tribunal de commerce","Le commissaire du Gouvernement"],a:1,ex:"Art. 168 : informer le président du CR avant de procéder à la rétention.",sr:"Art. 168 décret 2012-432"},
+{id:"v4d25",p:"EC",th:"Déontologie",ty:"qrc",q:"Comment l'article 22 de l'ordonnance de 1945 encadre-t-il la notion d'intérêts substantiels ?",a:"L'article 22 interdit d'effectuer des travaux d'EC pour les entreprises dans lesquelles l'EC possède directement ou indirectement des intérêts substantiels. La notion d'intérêts substantiels s'entend comme la capacité à interférer dans le processus de décision (ex : droit de blocage de 33% en SARL ou 25% en SA).",sr:"Art. 22 al. 5 ord. 1945",kw:["intérêts substantiels","interférer","processus de décision","droit de blocage","33%","25%","interdit"],tip:"Définissez la notion d'intérêts substantiels avec les seuils concrets de blocage selon la forme sociale."},
+
+// ── CONTRÔLE QUALITÉ / NORMES (20 questions) ──
+
+{id:"v4q1",p:"EC",th:"Qualité",ty:"qcm",q:"Le cadre de référence du référentiel normatif a été agréé le :",ch:["1er septembre 2016","10 juin 2022","1er juillet 2025","22 août 2025"],a:2,ex:"Agréé par arrêté du 1er juillet 2025 (JO 21 août), applicable le 22 août 2025.",sr:"Cadre de référence, Réf. normatif 2025"},
+{id:"v4q2",p:"EC",th:"Qualité",ty:"qcm",q:"Le cadre de référence distingue trois grandes natures de missions :",ch:["Comptables, juridiques, fiscales","D'assurance sur comptes, autres assurances, sans assurance","Audit, conseil, attestation","Légales, contractuelles, accessoires"],a:1,ex:"Missions d'assurance sur comptes complets historiques, autres missions d'assurance, missions sans assurance.",sr:"Cadre de référence"},
+{id:"v4q3",p:"EC",th:"Qualité",ty:"qrc",q:"Quelle est la différence entre la mission de présentation des comptes (NP 2300) et l'examen limité (NP 2400) ?",a:"La présentation (NP 2300) exprime une assurance modérée sur la cohérence et vraisemblance des comptes, basée sur les informations du client, la technique comptable et les procédés analytiques. Elle n'est pas applicable aux comptes consolidés. L'examen limité (NP 2400) exprime une assurance modérée sur la conformité au référentiel comptable, avec des diligences supérieures : prise de connaissance, analyse des procédures, collecte d'éléments probants. Il peut porter sur des comptes consolidés.",sr:"Cadre de référence / NP 2300 et NP 2400",kw:["présentation","cohérence","vraisemblance","examen limité","conformité","référentiel","assurance modérée","consolidés","éléments probants"],tip:"Les deux expriment une assurance modérée mais sur des objets différents. Précisez le champ d'application (consolidés ou non)."},
+{id:"v4q4",p:"EC",th:"Qualité",ty:"qcm",q:"La mission d'audit d'états financiers exprime une assurance :",ch:["Modérée","Raisonnable","Absolue","Limitée"],a:1,ex:"Assurance raisonnable sur la conformité des états financiers au référentiel applicable.",sr:"Cadre de référence"},
+{id:"v4q5",p:"EC",th:"Qualité",ty:"qcm",q:"La mission de compilation de comptes (NP 4410) est destinée :",ch:["À toutes les entités","Exclusivement aux entités du périmètre de consolidation d'un groupe audité","Aux associations","Aux TPE"],a:1,ex:"Exclusivement destinée aux filiales d'un groupe audité qui assure en interne sa comptabilité.",sr:"NP 4410 / Cadre de référence"},
+{id:"v4q6",p:"EC",th:"Qualité",ty:"qcm",q:"La NPMQ (Norme Professionnelle de Management de la Qualité) est applicable depuis :",ch:["1er juillet 2022","1er janvier 2025","1er septembre 2016","3 mai 2021"],a:1,ex:"Agréée le 30 mai 2024, applicable à compter du 1er janvier 2025.",sr:"NPMQ, Réf. normatif 2025"},
+{id:"v4q7",p:"EC",th:"Qualité",ty:"qcm",q:"Le système de management de la qualité (NPMQ) est constitué de :",ch:["Règles, procédures écrites, dispositif de surveillance","Manuel qualité, rapports, contrôles","Normes ISA, code déontologie, NPLAB","Logiciels, bases de données, archives"],a:0,ex:"NPMQ §3 : règles + procédures écrites + dispositif de surveillance.",sr:"NPMQ §3"},
+{id:"v4q8",p:"EC",th:"Qualité",ty:"qrc",q:"Quels sont les 8 domaines couverts par le système de management de la qualité (NPMQ §11) ?",a:"1) Évaluation des risques qualité, 2) Responsabilité de l'équipe dirigeante, 3) Règles de déontologie, 4) Acceptation et maintien des relations clients/missions, 5) Ressources, 6) Réalisation des missions, 7) Surveillance du SMQ, 8) Informations et communications.",sr:"NPMQ §11",kw:["risques","équipe dirigeante","déontologie","acceptation","maintien","ressources","réalisation","surveillance","communications"],tip:"Listez les 8 domaines dans l'ordre de la norme. Les erreurs classiques : oublier « informations et communications » ou « évaluation des risques »."},
+{id:"v4q9",p:"EC",th:"Qualité",ty:"qcm",q:"Les modalités d'application de la NPMQ (paragraphes commençant par « A ») sont :",ch:["Obligatoires comme les exigences requises","Obligatoires seulement pour les grands cabinets","Non obligatoires mais facilitent l'application","Optionnelles et sans valeur normative"],a:2,ex:"Les modalités d'application ne constituent pas des obligations mais facilitent l'application pertinente.",sr:"NPMQ §7"},
+{id:"v4q10",p:"EC",th:"Qualité",ty:"qcm",q:"Selon la NPMQ, qui assume la responsabilité du système de management de la qualité ?",ch:["Le responsable qualité désigné","L'équipe dirigeante","Le conseil régional de l'Ordre","Chaque responsable de mission"],a:1,ex:"NPMQ §13 : l'équipe dirigeante promeut la culture qualité et assume la responsabilité du SMQ.",sr:"NPMQ §13"},
+{id:"v4q11",p:"EC",th:"Qualité",ty:"qcm",q:"La NPMQ exige une confirmation écrite périodique du respect de l'indépendance par :",ch:["Les clients","Les stagiaires uniquement","Tout le personnel technique","L'équipe dirigeante seule"],a:2,ex:"NPMQ §17 : confirmation écrite périodique de tout le personnel technique.",sr:"NPMQ §17"},
+{id:"v4q12",p:"EC",th:"Qualité",ty:"qcm",q:"Selon la NPLAB, la déclaration de soupçon à TRACFIN doit être conservée :",ch:["3 ans","5 ans à compter de l'envoi","10 ans","Indéfiniment"],a:1,ex:"NPLAB §16 : conservée 5 ans à compter de l'envoi, en dehors des dossiers (confidentiel).",sr:"NPLAB §16"},
+{id:"v4q13",p:"EC",th:"Qualité",ty:"qcm",q:"Selon la NPLAB, le seuil en dessous duquel le responsable de mission n'exécute aucune vigilance pour un client occasionnel est de :",ch:["5 000 €","10 000 €","15 000 €","25 000 €"],a:2,ex:"NPLAB §26b : seuil de 15 000 € pour les opérations ponctuelles d'un client occasionnel.",sr:"NPLAB §26b"},
+{id:"v4q14",p:"EC",th:"Qualité",ty:"qrc",q:"Quelles sont les obligations du correspondant TRACFIN au sein de la structure d'exercice ?",a:"Le correspondant TRACFIN est désigné lors de la première déclaration de soupçon. Il répond aux demandes de TRACFIN, centralise et transmet les informations générales de TRACFIN et du Conseil de l'Ordre, sensibilise la structure aux risques de blanchiment et assure la mise à jour des procédures internes.",sr:"NPLAB §12-13",kw:["correspondant","première déclaration","répondre","demandes","centraliser","informations","sensibiliser","blanchiment","procédures internes"],tip:"Distinguez les 4 rôles du correspondant TRACFIN prévus par la NPLAB §13."},
+{id:"v4q15",p:"EC",th:"Qualité",ty:"qcm",q:"La classification des risques NPLAB s'opère selon au moins :",ch:["2 critères","3 critères","4 critères","6 critères"],a:2,ex:"NPLAB §19 : 4 critères minimum : caractéristiques des clients, activité, localisation, missions proposées.",sr:"NPLAB §19"},
+{id:"v4q16",p:"EC",th:"Qualité",ty:"qcm",q:"La mission d'attestation particulière (NP 3100) peut exprimer une assurance :",ch:["Uniquement raisonnable","Uniquement modérée","Raisonnable ou modérée","Aucune assurance"],a:2,ex:"NP 3100 : assurance de niveau raisonnable ou modéré selon les critères applicables.",sr:"NP 3100 / Cadre de référence"},
+{id:"v4q17",p:"EC",th:"Qualité",ty:"qcm",q:"La mission de procédures convenues (NP 4400) exprime :",ch:["Une assurance raisonnable","Une assurance modérée","Aucune assurance (constats uniquement)","Une assurance limitée"],a:2,ex:"NP 4400 : seuls des constats, aucune assurance. Les destinataires tirent leurs propres conclusions.",sr:"NP 4400 / Cadre de référence"},
+{id:"v4q18",p:"EC",th:"Qualité",ty:"qcm",q:"La supervision des missions relève de la responsabilité :",ch:["Du conseil régional","Du responsable qualité","Du responsable de la mission","De l'équipe dirigeante"],a:2,ex:"NPMQ §30 : la supervision relève de la responsabilité du responsable de la mission.",sr:"NPMQ §30"},
+{id:"v4q19",p:"EC",th:"Qualité",ty:"qcm",q:"La NPMQ impose que la structure conserve la documentation de son SMQ pendant :",ch:["3 ans","5 ans","10 ans","Une période adaptée à son organisation"],a:3,ex:"NPMQ §44 : période adaptée à l'organisation de la structure.",sr:"NPMQ §44"},
+{id:"v4q20",p:"EC",th:"Qualité",ty:"qrc",q:"Quelles sont les 3 conditions cumulatives pour accepter ou maintenir une mission selon la NPMQ ?",a:"La structure : 1) peut se conformer aux obligations légales, réglementaires et aux normes professionnelles, 2) ne conclut pas à un manque d'intégrité du client, 3) a la compétence, le temps et les ressources nécessaires pour réaliser la mission.",sr:"NPMQ §18",kw:["conformer","obligations","normes","intégrité","client","compétence","temps","ressources"],tip:"Les 3 conditions sont cumulatives (et non alternatives). L'erreur classique est d'oublier la condition d'intégrité du client."},
+
+// ── RESPONSABILITÉ (15 questions) ──
+
+{id:"v4r1",p:"EC",th:"Responsabilité",ty:"qcm",q:"Combien de sanctions disciplinaires sont prévues par l'article 53 de l'ordonnance de 1945 ?",ch:["3","4","5","6"],a:2,ex:"5 sanctions : réprimande, blâme avec inscription, suspension avec sursis, suspension, radiation.",sr:"Art. 53 ord. 1945"},
+{id:"v4r2",p:"EC",th:"Responsabilité",ty:"qcm",q:"L'avertissement du président de la chambre de discipline est :",ch:["La première sanction disciplinaire","Un préalable obligatoire","Réservé aux faits ne justifiant pas d'autre sanction","Prononcé par le conseil régional"],a:2,ex:"Art. 53 : avertissement dans le cabinet du président pour faits ne justifiant pas d'autre sanction.",sr:"Art. 53 ord. 1945"},
+{id:"v4r3",p:"EC",th:"Responsabilité",ty:"qcm",q:"Le sursis en matière de suspension est révoqué si une nouvelle peine intervient dans :",ch:["2 ans","3 ans","5 ans","10 ans"],a:2,ex:"Art. 53 : si dans un délai de 5 ans, nouvelle infraction → exécution de la première peine.",sr:"Art. 53 ord. 1945"},
+{id:"v4r4",p:"EC",th:"Responsabilité",ty:"qrc",q:"Quelles sont les conséquences d'une radiation du Tableau pour l'EC et ses clients ?",a:"Interdiction définitive d'exercer. L'EC radié est remplacé dans ses missions, soit d'office, soit à la requête de la partie la plus diligente. Les clients peuvent retirer les missions sans indemnité, à charge pour l'EC de restituer tous les documents et sommes non correspondant à des frais exposés. Les actes visant à permettre l'exercice à un EC radié sont nuls.",sr:"Art. 53 ord. 1945",kw:["interdiction définitive","remplacé","missions","clients","retirer","sans indemnité","restituer","documents","nuls"],tip:"Détaillez les conséquences pour l'EC (interdiction, nullité des actes) ET pour les clients (droit de retrait, restitution)."},
+{id:"v4r5",p:"EC",th:"Responsabilité",ty:"qcm",q:"L'article 53 bis concerne les manquements en matière de :",ch:["Assurance professionnelle","Lutte anti-blanchiment","Secret professionnel","Formation continue"],a:1,ex:"Art. 53 bis : renvoi à l'art. L.561-36-3 CMF pour manquements anti-blanchiment.",sr:"Art. 53 bis ord. 1945"},
+{id:"v4r6",p:"EC",th:"Responsabilité",ty:"qcm",q:"La publication des décisions de suspension ou radiation se fait :",ch:["Au JO uniquement","Dans tout support approprié, sans leurs motifs","Au BO du ministère avec motifs","Sur le site de l'Ordre avec motifs"],a:1,ex:"Art. 54 : publication sans leurs motifs dans tout support approprié.",sr:"Art. 54 ord. 1945"},
+{id:"v4r7",p:"EC",th:"Responsabilité",ty:"qcm",q:"L'EC suspendu du tableau doit, pendant sa suspension :",ch:["Continuer à payer les salaires de ses employés","Cesser toute activité y compris le paiement des salaires","Transférer ses dossiers au CR","Fermer définitivement son cabinet"],a:0,ex:"Art. 53 : l'EC suspendu doit continuer à payer salaires et indemnités à ses employés.",sr:"Art. 53 ord. 1945"},
+{id:"v4r8",p:"EC",th:"Responsabilité",ty:"qcm",q:"L'appel d'une décision de la chambre régionale de discipline est :",ch:["Non suspensif","Suspensif","Suspensif sauf radiation","Non suspensif sauf demande expresse"],a:1,ex:"Art. 53 : le délai d'appel et l'appel sont suspensifs.",sr:"Art. 53 ord. 1945"},
+{id:"v4r9",p:"EC",th:"Responsabilité",ty:"qcm",q:"Le recours contre une décision de la chambre nationale de discipline se fait devant :",ch:["La Cour d'appel de Paris","La Cour de cassation","Le Conseil d'État","Le tribunal administratif"],a:2,ex:"Art. 53 : recours devant le Conseil d'État (non suspensif, sauf sursis à exécution).",sr:"Art. 53 ord. 1945"},
+{id:"v4r10",p:"EC",th:"Responsabilité",ty:"qcm",q:"La réprimande, le blâme et la suspension peuvent être assortis d'une privation du droit de siéger aux conseils de l'Ordre pendant :",ch:["3 ans maximum","5 ans maximum","10 ans maximum","Durée indéterminée"],a:2,ex:"Art. 53 : privation du droit de faire partie des conseils pendant une durée n'excédant pas 10 ans.",sr:"Art. 53 ord. 1945"},
+{id:"v4r11",p:"EC",th:"Responsabilité",ty:"qrc",q:"Qui est le complice de l'EC radié ou suspendu qui continue d'exercer via un acte ou convention ?",a:"Toute personne intervenant à des actes, traités ou conventions tendant à permettre l'exercice par un EC radié ou suspendu peut être poursuivie comme complice et est passible des mêmes peines pour exercice illégal de la profession.",sr:"Art. 53 ord. 1945",kw:["complice","actes","conventions","poursuivie","mêmes peines","exercice illégal"],tip:"L'article 53 prévoit la nullité des actes ET la complicité des tiers. C'est un piège fréquent au DEC."},
+{id:"v4r12",p:"EC",th:"Responsabilité",ty:"qcm",q:"L'article 17 de l'ordonnance de 1945 concerne :",ch:["Les honoraires","La responsabilité civile et l'assurance","Le secret professionnel","La formation continue"],a:1,ex:"Art. 17 : responsabilité civile et obligation d'assurance professionnelle.",sr:"Art. 17 ord. 1945"},
+{id:"v4r13",p:"EC",th:"Responsabilité",ty:"qcm",q:"Le décret n°2025-483 du 30 mai 2025 modifie les articles 134 à 136 sur :",ch:["Les élections ordinales","L'obligation d'assurance des EC","Le contrôle qualité","La formation continue"],a:1,ex:"Décret 2025-483 : sécuriser la couverture d'assurance des personnes exerçant en société.",sr:"Décret 2025-483 du 30/05/2025"},
+{id:"v4r14",p:"EC",th:"Responsabilité",ty:"qcm",q:"L'article 12 de l'ordonnance de 1945 prévoit que les travaux de l'EC doivent être assortis de :",ch:["La signature du client","La signature personnelle de l'EC et du visa social","Le cachet du conseil régional","Un numéro d'enregistrement"],a:1,ex:"Art. 12 : signature personnelle de l'EC + visa ou signature sociale de la structure.",sr:"Art. 12 ord. 1945"},
+{id:"v4r15",p:"EC",th:"Responsabilité",ty:"qrc",q:"Quelle est la différence entre « prérogative d'exercice exclusive » et « monopole » pour les missions EC de l'article 2 ?",a:"La prérogative d'exercice exclusive (réserve d'activité) n'oblige pas les entreprises à recourir à un EC : elles peuvent tenir leur comptabilité elles-mêmes. Mais si elles souhaitent confier cette mission à un tiers extérieur, elles doivent recourir à un EC inscrit. Le monopole imposerait l'obligation de recourir à un EC, ce qui n'est pas le cas.",sr:"Art. 2 ord. 1945 / Guide profession EC 2025",kw:["prérogative","réserve d'activité","pas obligation","elles-mêmes","tiers extérieur","inscrit","monopole","différence"],tip:"Le piège est de confondre les deux notions. La Commission européenne examine régulièrement cette distinction."},
+];
+
+// ============================================================
+// SPACED REPETITION + SHUFFLE UTILS
+// ============================================================
+const initSR=()=>({ease:2.5,interval:0,reps:0,next:Date.now(),last:null});
+function upSR(c,q){let{ease:e,interval:i,reps:r}=c;if(q<1){r=0;i=1}else{if(!r)i=1;else if(r===1)i=3;else i=Math.round(i*e);r++;e=Math.max(1.3,e+(.1-(3-q)*(.08+(3-q)*.02)))}return{ease:e,interval:i,reps:r,next:Date.now()+i*864e5,last:q}}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function shuffleChoices(q){
+  if(q.ty!=='qcm')return{choices:q.ch,correctIdx:q.a};
+  const indexed=q.ch.map((c,i)=>({text:c,wasCorrect:i===q.a}));
+  const shuffled=shuffle(indexed);
+  return{choices:shuffled.map(s=>s.text),correctIdx:shuffled.findIndex(s=>s.wasCorrect)};
+}
+function checkKeywords(input,keywords){
+  if(!keywords||!keywords.length)return{found:[],missing:keywords||[],score:0};
+  const lower=input.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const found=[];const missing=[];
+  keywords.forEach(kw=>{
+    const kwNorm=kw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if(lower.includes(kwNorm))found.push(kw);else missing.push(kw);
+  });
+  return{found,missing,score:keywords.length>0?found.length/keywords.length:0};
+}
+
+// ============================================================
+// STATE + SUPABASE
+// ============================================================
+let S={
+  v:'loading',user:null,cards:{},exams:[],
+  flt:{prof:'all',th:'all'},cur:null,showAns:false,qrcIn:'',shuffled:null,showHelp:false,
+  eQs:null,eAns:{},eIdx:0,tmr:3600,eDone:false,eMode:'mixed',eShuffles:{},eShowHelp:{},
+  am:'login',ae:'',ap:'',aErr:'',aLoad:false,
+  sv:'',ti:null
+};
+function set(u){Object.assign(S,u);R()}
+
+async function loadUD(){
+  const{data:cr}=await sb.from('card_states').select('*').eq('user_id',S.user.id);
+  const cards={};QS.forEach(q=>{cards[q.id]=initSR()});
+  if(cr)cr.forEach(r=>{cards[r.card_id]={ease:r.ease,interval:r.interval,reps:r.reps,next:r.next_review,last:r.last_result}});
+  const{data:er}=await sb.from('exam_history').select('*').eq('user_id',S.user.id).order('created_at',{ascending:true});
+  set({cards,exams:er||[],v:'home'});
+}
+async function saveC(cid,cs){
+  await sb.from('card_states').upsert({user_id:S.user.id,card_id:cid,ease:cs.ease,interval:cs.interval,reps:cs.reps,next_review:cs.next,last_result:cs.last,updated_at:new Date().toISOString()},{onConflict:'user_id,card_id'});
+  set({sv:'✓'});setTimeout(()=>set({sv:''}),1500);
+}
+async function saveE(ec,cac,tot,tu){
+  const{data}=await sb.from('exam_history').insert({user_id:S.user.id,score_ec:ec,score_cac:cac,score_total:tot,time_used:tu}).select();
+  if(data)set({exams:[...S.exams,...data]});
+}
+
+async function doAuth(){
+  set({aLoad:true,aErr:''});
+  try{
+    if(S.am==='login'){const{error}=await sb.auth.signInWithPassword({email:S.ae,password:S.ap});if(error)throw error}
+    else{const{error}=await sb.auth.signUp({email:S.ae,password:S.ap});if(error)throw error;set({aErr:'Vérifie ton email pour confirmer.',aLoad:false});return}
+  }catch(e){set({aErr:e.message,aLoad:false});return}
+  set({aLoad:false});
+}
+async function logout(){await sb.auth.signOut();set({user:null,v:'auth',cards:{},exams:[]})}
+sb.auth.onAuthStateChange(async(_,session)=>{
+  if(session?.user){set({user:session.user,v:'loading'});await loadUD()}
+  else set({user:null,v:'auth'})
+});
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function getFiltered(){
+  return QS.filter(q=>{
+    if(S.flt.prof!=='all'&&q.p!==S.flt.prof)return false;
+    if(S.flt.th!=='all'&&q.th!==S.flt.th)return false;
+    return true;
+  });
+}
+function getDue(){
+  const now=Date.now();
+  return getFiltered().filter(q=>{const s=S.cards[q.id];return!s||s.next<=now});
+}
+function pickN(){
+  const d=getDue();if(!d.length){set({cur:null,showAns:false,qrcIn:'',shuffled:null,showHelp:false});return}
+  const q=d[Math.floor(Math.random()*d.length)];
+  set({cur:q,showAns:false,qrcIn:'',shuffled:shuffleChoices(q),showHelp:false});
+}
+function rate(quality){
+  if(!S.cur)return;
+  const ns=upSR(S.cards[S.cur.id]||initSR(),quality);
+  S.cards[S.cur.id]=ns;saveC(S.cur.id,ns);pickN();
+}
+
+function startExam(mode){
+  let qs=getFiltered();
+  if(mode==='qcm')qs=qs.filter(q=>q.ty==='qcm');
+  else if(mode==='qrc')qs=qs.filter(q=>q.ty==='qrc');
+  let pool=shuffle(qs);
+  const ec=pool.filter(q=>q.p==='EC').slice(0,10);
+  const cac=pool.filter(q=>q.p==='CAC').slice(0,10);
+  const examQs=[...ec,...cac];
+  const eShuffles={};
+  examQs.forEach(q=>{eShuffles[q.id]=shuffleChoices(q)});
+  if(S.ti)clearInterval(S.ti);
+  const ti=setInterval(()=>{S.tmr--;if(S.tmr<=0){clearInterval(ti);finishE()}R()},1000);
+  set({eQs:examQs,eAns:{},eIdx:0,tmr:3600,eDone:false,eMode:mode,eShuffles,eShowHelp:{},v:'exam',ti});
+}
+
+function finishE(){
+  if(S.ti)clearInterval(S.ti);
+  let ec=0,cac=0;
+  S.eQs.forEach(q=>{
+    const ua=S.eAns[q.id];
+    if(q.ty==='qcm'){
+      const sh=S.eShuffles[q.id];
+      if(ua!==undefined&&sh.choices[ua]===q.ch[q.a]){if(q.p==='EC')ec++;else cac++}
+    }else if(q.ty==='qrc'&&q.kw){
+      const{score}=checkKeywords(ua||'',q.kw);
+      const pts=score>=.6?1:score>=.3?.5:0;
+      if(q.p==='EC')ec+=pts;else cac+=pts;
+    }
+  });
+  ec=Math.round(ec*10)/10;cac=Math.round(cac*10)/10;
+  saveE(ec,cac,Math.round((ec+cac)*10)/10,3600-S.tmr);
+  set({eDone:true});
+}
+
+function getStats(){
+  const filtered=getFiltered();
+  const s={total:filtered.length,mas:0,learn:0,new_:0,bp:{EC:{c:0,t:0},CAC:{c:0,t:0}}};
+  filtered.forEach(q=>{const c=S.cards[q.id];if(!c||!c.reps)s.new_++;else if(c.interval>=7)s.mas++;else s.learn++;if(s.bp[q.p]){s.bp[q.p].t++;if(c&&c.last>=2)s.bp[q.p].c++}});
+  return s;
+}
+
+const fmt=s=>`${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+const fmtD=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+const themes=[...new Set(QS.map(q=>q.th))];
+
+// ============================================================
+// RENDER
+// ============================================================
+function R(){
+  const $=document.getElementById('app');
+
+  if(S.v==='loading'){$.innerHTML=`<div class="ctn" style="display:flex;align-items:center;justify-content:center;min-height:100dvh"><div style="text-align:center"><div style="font-size:32px;margin-bottom:12px">📚</div><div style="font-size:14px;color:var(--mu)">Chargement...</div></div></div>`;return}
+
+  if(S.v==='auth'){
+    const il=S.am==='login';
+    $.innerHTML=`<div class="ctn" style="display:flex;flex-direction:column;justify-content:center;min-height:100dvh">
+      <div style="text-align:center;margin-bottom:32px"><div style="font-size:12px;font-weight:500;letter-spacing:3px;color:var(--dm);text-transform:uppercase;margin-bottom:8px">DEC — Mai 2026</div><h1 style="font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--b2),#a78bfa,var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Révisions <span class="v4badge">v4</span></h1><div style="font-size:11px;color:var(--dm);margin-top:6px">${QS.length} questions • UE1 + UE2</div></div>
+      <div class="cd" style="padding:24px"><h2 style="font-size:18px;font-weight:700;margin-bottom:20px;text-align:center">${il?'Connexion':'Inscription'}</h2>
+      <input class="fi" type="email" placeholder="Email" value="${S.ae}" style="margin-bottom:10px" id="ae">
+      <input class="fi" type="password" placeholder="Mot de passe${il?'':' (min. 6 car.)'}" style="margin-bottom:16px" id="ap">
+      ${S.aErr?`<div style="color:var(--rd);font-size:12px;margin-bottom:12px">${S.aErr}</div>`:''}
+      <button class="bt bt1" id="as" ${S.aLoad?'disabled':''}>${S.aLoad?'...':il?'Se connecter':'S\'inscrire'}</button>
+      <div style="text-align:center;margin-top:16px"><button style="background:none;border:none;color:var(--b2);font-size:13px;text-decoration:underline;cursor:pointer" id="at">${il?'Créer un compte':'Déjà inscrit ?'}</button></div></div></div>`;
+    document.getElementById('ae').addEventListener('input',e=>S.ae=e.target.value);
+    document.getElementById('ap').addEventListener('input',e=>S.ap=e.target.value);
+    document.getElementById('as').addEventListener('click',doAuth);
+    document.getElementById('ap').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()});
+    document.getElementById('at').addEventListener('click',()=>set({am:il?'signup':'login',aErr:''}));
+    return;
+  }
+
+  if(S.v==='home'){
+    const st=getStats(),due=getDue().length,el=S.exams.slice(-6);
+    $.innerHTML=`<div class="ctn">
+      <div style="text-align:center;margin-bottom:24px"><div style="font-size:11px;letter-spacing:3px;color:var(--dm);text-transform:uppercase;margin-bottom:4px">UE1 Déontologie • UE2</div><h1 style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--b2),#a78bfa,var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent">DEC Révisions <span class="v4badge">v4</span></h1><div style="font-size:11px;color:var(--mu);margin-top:3px">${S.user?.email||''} ${S.sv?`<span style="color:var(--gn)">${S.sv}</span>`:''}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">${[{l:'Nouvelles',v:st.new_,c:'var(--bl)',b:'rgba(59,130,246,.12)'},{l:'En cours',v:st.learn,c:'var(--yl)',b:'rgba(245,158,11,.12)'},{l:'Maîtrisées',v:st.mas,c:'var(--gn)',b:'rgba(16,185,129,.12)'}].map(s=>`<div style="background:${s.b};border-radius:14px;padding:13px;text-align:center"><div class="mn" style="font-size:26px;font-weight:700;color:${s.c}">${s.v}</div><div style="font-size:10px;color:var(--mu)">${s.l}</div></div>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">${['EC','CAC'].map(p=>{const d=st.bp[p],pc=d.t?Math.round(d.c/d.t*100):0;return`<div class="cd" style="padding:12px 14px"><div style="font-size:12px;font-weight:600;color:${p==='EC'?'var(--b2)':'var(--gd)'};margin-bottom:6px">${p==='EC'?'Expert-Comptable':'Commissaire aux Comptes'}</div><div class="pb"><div class="pf" style="width:${pc}%;background:${p==='EC'?'var(--bl)':'var(--yl)'}"></div></div><div style="font-size:11px;color:var(--dm);margin-top:4px">${pc}% • ${d.c}/${d.t}</div></div>`}).join('')}</div>
+      ${el.length?`<div class="cd" style="padding:14px;margin-bottom:18px"><div style="font-size:11px;font-weight:600;color:var(--mu);margin-bottom:8px">📈 Examens (${S.exams.length})</div><div style="display:flex;align-items:end;gap:5px;height:50px">${el.map(e=>{const h=Math.max(6,e.score_total/20*46),c=e.score_total>=14?'var(--gn)':e.score_total>=10?'var(--yl)':'var(--rd)';return`<div style="flex:1;text-align:center"><div class="mn" style="font-size:8px;font-weight:600;color:${c}">${e.score_total}</div><div style="width:100%;height:${h}px;background:${c}33;border-radius:3px;border:1px solid ${c}55"></div><div style="font-size:7px;color:var(--dm)">${fmtD(e.created_at)}</div></div>`}).join('')}</div></div>`:''}
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button class="bt bt1" id="bf">📚 Flashcards — ${due} carte${due>1?'s':''}</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <button class="bt bt2" style="font-size:12px;padding:12px 8px" data-em="mixed">🎯 Mixte</button>
+          <button class="bt bt2" style="font-size:12px;padding:12px 8px;background:linear-gradient(135deg,var(--gn),#059669)" data-em="qcm">QCM seul</button>
+          <button class="bt bt2" style="font-size:12px;padding:12px 8px;background:linear-gradient(135deg,#a855f7,var(--pu))" data-em="qrc">QRC seul</button>
+        </div>
+        <button class="bt bt3" style="font-size:12px;padding:10px;opacity:.5" id="bl">Déconnexion</button>
+      </div>
+      <div style="margin-top:14px">
+        <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap">${['all','EC','CAC'].map(f=>`<button style="padding:5px 12px;border-radius:20px;border:${S.flt.prof===f?'1px solid var(--b2)':'1px solid var(--bd)'};background:${S.flt.prof===f?'rgba(96,165,250,.15)':'transparent'};color:${S.flt.prof===f?'var(--b2)':'var(--mu)'};font-size:11px;font-weight:500" data-f="${f}">${f==='all'?'Toutes':f}</button>`).join('')}</div>
+        <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:8px">${['all',...themes].map(t=>`<button style="padding:3px 9px;border-radius:14px;border:${S.flt.th===t?'1px solid #a855f7':'1px solid var(--bd)'};background:${S.flt.th===t?'rgba(168,85,247,.12)':'transparent'};color:${S.flt.th===t?'#a855f7':'var(--dm)'};font-size:10px;font-weight:500" data-th="${t}">${t==='all'?'Tous thèmes':t}</button>`).join('')}</div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--dm)">${QS.length} questions • ${QS.filter(q=>q.ty==='qcm').length} QCM • ${QS.filter(q=>q.ty==='qrc').length} QRC</div>
+    </div>`;
+    document.getElementById('bf').addEventListener('click',()=>{pickN();set({v:'flashcard'})});
+    document.querySelectorAll('[data-em]').forEach(b=>b.addEventListener('click',()=>startExam(b.dataset.em)));
+    document.getElementById('bl').addEventListener('click',logout);
+    document.querySelectorAll('[data-f]').forEach(b=>b.addEventListener('click',()=>set({flt:{...S.flt,prof:b.dataset.f}})));
+    document.querySelectorAll('[data-th]').forEach(b=>b.addEventListener('click',()=>set({flt:{...S.flt,th:b.dataset.th}})));
+    return;
+  }
+
+  if(S.v==='flashcard'){
+    if(!S.cur){$.innerHTML=`<div class="ctn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80dvh"><div style="font-size:48px;margin-bottom:16px">🎉</div><h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Cartes à jour !</h2><p style="color:var(--mu);margin-bottom:24px">Reviens plus tard.</p><button class="bt bt1" style="width:auto;padding:14px 32px" id="bk">Retour</button></div>`;document.getElementById('bk').addEventListener('click',()=>set({v:'home'}));return}
+    const q=S.cur,sh=S.shuffled,due=getDue();
+    let html='';
+    if(!S.showAns){
+      if(q.ty==='qcm'){
+        html=`<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">${sh.choices.map((c,i)=>`<button class="ch" data-sw="1"><span style="font-weight:600;color:var(--dm);margin-right:7px">${String.fromCharCode(65+i)})</span>${c}</button>`).join('')}</div>`;
+      }else{
+        html=`<textarea class="fi" id="qi" placeholder="Rédigez votre réponse..." style="min-height:90px;resize:vertical;margin-bottom:8px">${S.qrcIn}</textarea>
+        ${!S.showHelp&&q.tip?`<button class="help-btn" id="hb">💡 Besoin d'aide ?</button>`:''}
+        ${S.showHelp&&q.tip?`<div class="tip fade"><div style="font-size:10px;font-weight:600;color:#a78bfa;margin-bottom:4px">💡 Conseil de rédaction</div><div style="font-size:12px;color:#d1d5db;line-height:1.5">${q.tip}</div></div>`:''}
+        <button class="bt bt1" style="background:var(--pu)" id="bs">Voir la réponse</button>`;
+      }
+    }else{
+      let choicesHtml='';
+      if(q.ty==='qcm'){
+        choicesHtml=sh.choices.map((c,i)=>`<div class="ch${i===sh.correctIdx?' ok':''}" style="cursor:default;margin-bottom:3px"><span style="margin-right:7px">${String.fromCharCode(65+i)})</span>${c}${i===sh.correctIdx?' ✓':''}</div>`).join('');
+      }
+      let kwHtml='';
+      if(q.ty==='qrc'&&q.kw){
+        const{found,missing,score}=checkKeywords(S.qrcIn,q.kw);
+        kwHtml=`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--mu);margin-bottom:6px">MOTS-CLÉS (${Math.round(score*100)}%)</div><div>${found.map(k=>`<span class="kw kw-ok">✓ ${k}</span>`).join('')}${missing.map(k=>`<span class="kw kw-miss">✗ ${k}</span>`).join('')}</div></div>`;
+      }
+      html=`<div class="fade">${choicesHtml?`<div style="margin-bottom:10px">${choicesHtml}</div>`:''}${kwHtml}
+        <div class="answer-box" style="background:rgba(16,185,129,.08);border-radius:13px;padding:16px;border:1px solid rgba(16,185,129,.15);margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:var(--gn);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">${q.ty==='qrc'?'Réponse attendue':'Explication'}</div><p style="font-size:13px;line-height:1.6;color:#d1d5db">${q.ty==='qcm'?q.ex:q.a}</p></div>
+        <div style="font-size:11px;color:var(--dm);margin-bottom:16px">📖 ${q.sr}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px">${[{l:'À revoir',s:'<1j',c:'var(--rd)',q:0},{l:'Difficile',s:'1j',c:'var(--yl)',q:1},{l:'Bien',s:'3j',c:'var(--bl)',q:2},{l:'Facile',s:'7j+',c:'var(--gn)',q:3}].map(b=>`<button style="padding:13px 6px;border-radius:11px;border:1px solid ${b.c}33;background:${b.c}1a;color:${b.c};font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;cursor:pointer;font-family:inherit" data-rt="${b.q}">${b.l}<span style="font-size:9px;opacity:.7">${b.s}</span></button>`).join('')}</div></div>`;
+    }
+    $.innerHTML=`<div class="ctn"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><button style="background:none;color:var(--mu);font-size:13px;cursor:pointer;font-family:inherit" id="bk">← Retour</button><div style="font-size:11px;color:var(--dm)">${due.length} restante${due.length>1?'s':''}</div></div>
+    <div style="display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap"><span class="tg tg-${q.p.toLowerCase()}">${q.p}</span><span class="tg" style="background:rgba(255,255,255,.06);color:var(--mu)">${q.th}</span><span class="tg tg-${q.ty}">${q.ty.toUpperCase()}</span></div>
+    <div class="cd" style="margin-bottom:14px"><p style="font-size:16px;font-weight:500;line-height:1.5">${q.q}</p></div>${html}</div>`;
+    document.getElementById('bk')?.addEventListener('click',()=>set({v:'home'}));
+    document.querySelectorAll('[data-sw]').forEach(b=>b.addEventListener('click',()=>set({showAns:true})));
+    document.getElementById('bs')?.addEventListener('click',()=>set({showAns:true}));
+    document.getElementById('hb')?.addEventListener('click',()=>set({showHelp:true}));
+    document.getElementById('qi')?.addEventListener('input',e=>S.qrcIn=e.target.value);
+    document.querySelectorAll('[data-rt]').forEach(b=>b.addEventListener('click',()=>rate(parseInt(b.dataset.rt))));
+    return;
+  }
+
+  if(S.v==='exam'){
+    if(!S.eQs)return;
+    if(S.eDone){
+      let ec=0,cac=0;
+      S.eQs.forEach(q=>{
+        const ua=S.eAns[q.id],sh=S.eShuffles[q.id];
+        if(q.ty==='qcm'){if(ua!==undefined&&sh.choices[ua]===q.ch[q.a]){if(q.p==='EC')ec++;else cac++}}
+        else if(q.kw){const{score}=checkKeywords(ua||'',q.kw);const pts=score>=.6?1:score>=.3?.5:0;if(q.p==='EC')ec+=pts;else cac+=pts}
+      });
+      ec=Math.round(ec*10)/10;cac=Math.round(cac*10)/10;const tot=Math.round((ec+cac)*10)/10;
+      $.innerHTML=`<div class="ctn"><h2 style="text-align:center;font-size:22px;font-weight:700;margin-bottom:20px">Résultats</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">${[{l:'EC',v:ec,c:'var(--b2)',b:'rgba(59,130,246,.12)'},{l:'CAC',v:cac,c:'var(--gd)',b:'rgba(245,158,11,.12)'},{l:'Total',v:tot,c:tot>=14?'var(--gn)':'var(--rd)',b:tot>=14?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'}].map((s,i)=>`<div style="background:${s.b};border-radius:14px;padding:18px;text-align:center"><div class="mn" style="font-size:28px;font-weight:700;color:${s.c}">${s.v}/${i<2?10:20}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">${s.l}</div></div>`).join('')}</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Correction</h3>
+        ${S.eQs.map((eq,i)=>{
+          const ua=S.eAns[eq.id],sh=S.eShuffles[eq.id];
+          let isOk=false,detail='';
+          if(eq.ty==='qcm'){
+            isOk=ua!==undefined&&sh.choices[ua]===eq.ch[eq.a];
+            detail=`<div style="font-size:11px;color:var(--mu)">${ua!==undefined&&!isOk?`<div style="color:var(--rd)">✗ ${sh.choices[ua]}</div>`:(ua===undefined?'<div style="color:var(--dm)">Non répondu</div>':'')}<div style="color:var(--gn)">✓ ${eq.ch[eq.a]}</div></div>`;
+          }else if(eq.kw){
+            const{found,missing,score}=checkKeywords(ua||'',eq.kw);
+            isOk=score>=.6;
+            detail=`<div style="margin:6px 0">${found.map(k=>`<span class="kw kw-ok">✓ ${k}</span>`).join('')}${missing.map(k=>`<span class="kw kw-miss">✗ ${k}</span>`).join('')}</div><div style="font-size:11px;color:var(--gn);margin-top:4px">Réponse attendue : ${eq.a}</div>`;
+          }
+          return`<div style="background:var(--cd);border-radius:11px;padding:14px;margin-bottom:8px;border-left:3px solid ${isOk?'var(--gn)':'var(--rd)'}">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10px;font-weight:600;color:${eq.p==='EC'?'var(--b2)':'var(--gd)'}">Q${i+1} — ${eq.p}</span><span class="tg tg-${eq.ty}" style="font-size:9px">${eq.ty.toUpperCase()}</span></div>
+            <p style="font-size:12px;margin-bottom:6px;color:#d1d5db">${eq.q}</p>${detail}
+            <p style="font-size:11px;color:var(--mu);margin-top:4px;line-height:1.5">${eq.ty==='qcm'?eq.ex:''}</p>
+            <div style="font-size:10px;color:var(--dm);margin-top:3px">📖 ${eq.sr}</div></div>`}).join('')}
+        <button class="bt bt1" style="margin-top:16px" id="bk">Retour</button></div>`;
+      document.getElementById('bk').addEventListener('click',()=>set({v:'home'}));return;
+    }
+    const q=S.eQs[S.eIdx],sh=S.eShuffles[q.id];
+    const helpVisible=S.eShowHelp[q.id];
+    $.innerHTML=`<div class="ctn">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:11px;color:var(--mu)">Q${S.eIdx+1}/${S.eQs.length}</div><div class="mn" style="font-size:17px;font-weight:700;color:${S.tmr<300?'var(--rd)':'var(--tx)'}">⏱ ${fmt(S.tmr)}</div><button style="padding:5px 12px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1);color:var(--rd);font-size:11px;cursor:pointer;font-family:inherit" id="fe">Terminer</button></div>
+      <div class="pb" style="margin-bottom:18px;height:3px"><div class="pf" style="width:${(S.eIdx+1)/S.eQs.length*100}%;background:linear-gradient(90deg,var(--bl),var(--pu))"></div></div>
+      <div style="display:flex;gap:5px;margin-bottom:10px"><span class="tg tg-${q.p.toLowerCase()}">${q.p}</span><span class="tg" style="background:rgba(255,255,255,.06);color:var(--mu)">${q.th}</span><span class="tg tg-${q.ty}">${q.ty.toUpperCase()}</span></div>
+      <div class="cd" style="margin-bottom:14px"><p style="font-size:15px;font-weight:500;line-height:1.5">${q.q}</p></div>
+      ${q.ty==='qcm'?`<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:18px">${sh.choices.map((c,i)=>`<button class="ch${S.eAns[q.id]===i?' sel':''}" data-ea="${i}"><span style="font-weight:600;color:var(--dm);margin-right:7px">${String.fromCharCode(65+i)})</span>${c}</button>`).join('')}</div>`
+      :`${q.ty==='qrc'&&q.tip&&!helpVisible?`<button class="help-btn" id="ehb">💡 Besoin d'aide ?</button>`:''}
+      ${helpVisible&&q.tip?`<div class="tip fade"><div style="font-size:10px;font-weight:600;color:#a78bfa;margin-bottom:4px">💡 Conseil de rédaction</div><div style="font-size:12px;color:#d1d5db;line-height:1.5">${q.tip}</div></div>`:''}
+      <textarea class="fi" id="qe" placeholder="Réponse courte..." style="min-height:90px;resize:vertical;margin-bottom:18px">${S.eAns[q.id]||''}</textarea>`}
+      <div style="display:flex;gap:8px">${S.eIdx>0?`<button class="bt bt3" style="flex:1" id="bp">←</button>`:''}
+      <button class="bt ${S.eIdx===S.eQs.length-1?'bt4':'bt1'}" style="flex:2" id="bn">${S.eIdx===S.eQs.length-1?'Terminer':'Suivant →'}</button></div>
+      <div style="display:flex;gap:3px;justify-content:center;margin-top:16px;flex-wrap:wrap">${S.eQs.map((_,i)=>`<button style="width:22px;height:22px;border-radius:5px;border:none;font-size:9px;font-weight:600;cursor:pointer;font-family:'JetBrains Mono';background:${i===S.eIdx?'var(--bl)':S.eAns[S.eQs[i].id]!==undefined?'rgba(16,185,129,.2)':'rgba(255,255,255,.06)'};color:${i===S.eIdx?'#fff':S.eAns[S.eQs[i].id]!==undefined?'var(--gn)':'var(--dm)'}" data-go="${i}">${i+1}</button>`).join('')}</div>
+    </div>`;
+    document.getElementById('fe')?.addEventListener('click',finishE);
+    document.getElementById('bp')?.addEventListener('click',()=>set({eIdx:S.eIdx-1}));
+    document.getElementById('bn')?.addEventListener('click',()=>{if(S.eIdx<S.eQs.length-1)set({eIdx:S.eIdx+1});else finishE()});
+    document.querySelectorAll('[data-ea]').forEach(b=>b.addEventListener('click',()=>{S.eAns[S.eQs[S.eIdx].id]=parseInt(b.dataset.ea);R()}));
+    document.getElementById('qe')?.addEventListener('input',e=>{S.eAns[S.eQs[S.eIdx].id]=e.target.value});
+    document.getElementById('ehb')?.addEventListener('click',()=>{S.eShowHelp[q.id]=true;R()});
+    document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>set({eIdx:parseInt(b.dataset.go)})));
+  }
+}
+R();
+</script>
+</body>
+</html>
