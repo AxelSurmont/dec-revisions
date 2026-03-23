@@ -1120,21 +1120,27 @@ function set(u){Object.assign(S,u);R()}
 
 async function loadUD(){
   if(!sb){set({cards:{},exams:[],v:'home'});return}
-  const{data:cr}=await sb.from('card_states').select('*').eq('user_id',S.user.id);
   const cards={};QS.forEach(q=>{cards[q.id]=initSR()});
-  if(cr)cr.forEach(r=>{cards[r.card_id]={ease:r.ease,interval:r.interval,reps:r.reps,next:r.next_review,last:r.last_result}});
-  const{data:er}=await sb.from('exam_history').select('*').eq('user_id',S.user.id).order('created_at',{ascending:true});
-  set({cards,exams:er||[],v:'home'});
+  try{
+    const{data:cr,error:e1}=await sb.from('card_states').select('*').eq('user_id',S.user.id);
+    if(!e1&&cr)cr.forEach(r=>{cards[r.card_id]={ease:r.ease,interval:r.interval,reps:r.reps,next:r.next_review,last:r.last_result}});
+  }catch(e){console.warn('card_states load failed:',e)}
+  let exams=[];
+  try{
+    const{data:er,error:e2}=await sb.from('exam_history').select('*').eq('user_id',S.user.id).order('created_at',{ascending:true});
+    if(!e2&&er)exams=er;
+  }catch(e){console.warn('exam_history load failed:',e)}
+  set({cards,exams,v:'home'});
 }
 async function saveC(cid,cs){
   if(!sb||!S.user)return;
-  await sb.from('card_states').upsert({user_id:S.user.id,card_id:cid,ease:cs.ease,interval:cs.interval,reps:cs.reps,next_review:cs.next,last_result:cs.last,updated_at:new Date().toISOString()},{onConflict:'user_id,card_id'});
+  try{await sb.from('card_states').upsert({user_id:S.user.id,card_id:cid,ease:cs.ease,interval:cs.interval,reps:cs.reps,next_review:cs.next,last_result:cs.last,updated_at:new Date().toISOString()},{onConflict:'user_id,card_id'})}catch(e){console.warn('saveC failed:',e)}
   set({sv:'✓'});setTimeout(()=>set({sv:''}),1500);
 }
 async function saveE(ec,cac,tot,tu){
   if(!sb||!S.user)return;
-  const{data}=await sb.from('exam_history').insert({user_id:S.user.id,score_ec:ec,score_cac:cac,score_total:tot,time_used:tu}).select();
-  if(data)set({exams:[...S.exams,...data]});
+  try{const{data}=await sb.from('exam_history').insert({user_id:S.user.id,score_ec:ec,score_cac:cac,score_total:tot,time_used:tu}).select();
+  if(data)set({exams:[...S.exams,...data]})}catch(e){console.warn('saveE failed:',e)}
 }
 
 async function doAuth(){
@@ -1149,8 +1155,17 @@ async function doAuth(){
 async function logout(){if(sb)await sb.auth.signOut();set({user:null,v:'auth',cards:{},exams:[]})}
 if(sb){
 sb.auth.onAuthStateChange(async(_,session)=>{
-  if(session?.user){set({user:session.user,v:'loading'});try{await loadUD()}catch(e){console.error('Load error:',e);set({v:'home',cards:{}})}}
-  else set({user:null,v:'auth'})
+  if(session?.user){
+    set({user:session.user,v:'loading'});
+    try{
+      const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000));
+      await Promise.race([loadUD(),timeout]);
+    }catch(e){
+      console.error('Load error/timeout:',e);
+      const cards={};QS.forEach(q=>{cards[q.id]=initSR()});
+      set({v:'home',cards,exams:[]});
+    }
+  } else set({user:null,v:'auth'})
 });
 }
 // Fallback: if Supabase doesn't respond within 5s, show auth screen
