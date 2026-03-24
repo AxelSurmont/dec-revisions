@@ -11,8 +11,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0e27;--bg2:#1a1f3a;--tx:#e2e8f0;--mu:#94a3b8;--dm:#64748b;--bl:#3b82f6;--b2:#60a5fa;--pu:#6366f1;--yl:#f59e0b;--gd:#fbbf24;--gn:#10b981;--rd:#ef4444;--pk:#f472b6;--cd:rgba(255,255,255,.04);--bd:rgba(255,255,255,.08)}
-body{min-height:100dvh;background:linear-gradient(135deg,var(--bg),var(--bg2),#0d1117);color:var(--tx);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+:root{--bg:#0a0e27;--bg2:#1a1f3a;--bg3:#0d1117;--tx:#e2e8f0;--mu:#94a3b8;--dm:#64748b;--bl:#3b82f6;--b2:#60a5fa;--pu:#6366f1;--yl:#f59e0b;--gd:#fbbf24;--gn:#10b981;--rd:#ef4444;--pk:#f472b6;--cd:rgba(255,255,255,.04);--bd:rgba(255,255,255,.08);--ans-bg:rgba(16,185,129,.08);--ans-bd:rgba(16,185,129,.15);--ans-tx:#d1d5db;--fi-bg:rgba(255,255,255,.06);--ch-bg:rgba(255,255,255,.03)}
+body.light{--bg:#f0f2f5;--bg2:#e8ebf0;--bg3:#f5f6fa;--tx:#1e293b;--mu:#64748b;--dm:#94a3b8;--cd:rgba(0,0,0,.04);--bd:rgba(0,0,0,.1);--ans-bg:rgba(16,185,129,.06);--ans-bd:rgba(16,185,129,.2);--ans-tx:#334155;--fi-bg:rgba(0,0,0,.04);--ch-bg:rgba(0,0,0,.02)}
+body{min-height:100dvh;background:linear-gradient(135deg,var(--bg),var(--bg2),var(--bg3));color:var(--tx);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
 .ctn{max-width:520px;margin:0 auto;padding:20px 16px}
 button{font-family:inherit;cursor:pointer;border:none;outline:none;-webkit-tap-highlight-color:transparent}
 input,textarea{font-family:inherit;outline:none}
@@ -21,32 +22,40 @@ input,textarea{font-family:inherit;outline:none}
 .tg-cac{background:rgba(245,158,11,.15);color:var(--gd)}
 .tg-qcm{background:rgba(16,185,129,.15);color:var(--gn)}
 .tg-qrc{background:rgba(168,85,247,.15);color:#a855f7}
-.bt{padding:15px 24px;border-radius:14px;font-size:15px;font-weight:600;width:100%;transition:transform .1s}
-.bt:active{transform:scale(.98)}
+.bt{padding:15px 24px;border-radius:14px;font-size:15px;font-weight:600;width:100%;transition:transform .15s,box-shadow .15s}
+.bt:active{transform:scale(.97)}
+.bt:hover{box-shadow:0 4px 15px rgba(0,0,0,.2)}
 .bt1{background:linear-gradient(135deg,var(--bl),var(--pu));color:#fff}
 .bt2{background:linear-gradient(135deg,var(--yl),var(--rd));color:#fff}
 .bt3{background:var(--cd);color:var(--tx);border:1px solid var(--bd)}
 .bt4{background:linear-gradient(135deg,var(--gn),#059669);color:#fff}
-.cd{background:var(--cd);border-radius:16px;padding:20px;border:1px solid var(--bd)}
-.ch{padding:13px 14px;border-radius:11px;border:1px solid var(--bd);background:rgba(255,255,255,.03);color:var(--tx);font-size:13px;text-align:left;width:100%;line-height:1.4;transition:.15s}
+.cd{background:var(--cd);border-radius:16px;padding:20px;border:1px solid var(--bd);transition:background .3s}
+.ch{padding:13px 14px;border-radius:11px;border:1px solid var(--bd);background:var(--ch-bg);color:var(--tx);font-size:13px;text-align:left;width:100%;line-height:1.4;transition:.2s}
+.ch:hover{border-color:var(--b2);background:rgba(96,165,250,.06)}
 .ch.sel{border-color:var(--b2);background:rgba(96,165,250,.12);color:var(--b2)}
-.ch.ok{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.15);color:var(--gn);font-weight:600}
-.ch.wrong{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--rd)}
-.fi{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--bd);background:rgba(255,255,255,.06);color:var(--tx);font-size:14px}
-.fi:focus{border-color:var(--bl)}
+.ch.ok{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.15);color:var(--gn);font-weight:600}
+.ch.wrong{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:var(--rd);font-weight:600}
+.fi{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--bd);background:var(--fi-bg);color:var(--tx);font-size:14px;transition:border-color .2s}
+.fi:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
 .fi::placeholder{color:var(--dm)}
 .kw{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;margin:2px}
 .kw-ok{background:rgba(16,185,129,.15);color:var(--gn);border:1px solid rgba(16,185,129,.3)}
 .kw-miss{background:rgba(239,68,68,.1);color:var(--rd);border:1px solid rgba(239,68,68,.2)}
 .tip{background:rgba(99,102,241,.08);border-radius:10px;padding:12px 14px;border:1px solid rgba(99,102,241,.15);margin-bottom:12px}
 .mn{font-family:'JetBrains Mono',monospace}
-.pb{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.pb{height:5px;background:var(--bd);border-radius:3px;overflow:hidden}
 .pf{height:100%;border-radius:3px;transition:width .5s}
-.fade{animation:fadeIn .3s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.slide{animation:slideIn .25s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 .help-btn{padding:8px 14px;border-radius:9px;border:1px solid rgba(168,85,247,.3);background:rgba(168,85,247,.1);color:#a855f7;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;margin-bottom:10px}
 .help-btn:hover{background:rgba(168,85,247,.2)}
-.v4badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:9px;font-weight:700;background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;vertical-align:middle;margin-left:4px}
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:100;width:36px;height:36px;border-radius:50%;border:1px solid var(--bd);background:var(--cd);color:var(--tx);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.theme-toggle:hover{background:var(--bd)}
+.qrc-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.qrc-compare>div{border-radius:11px;padding:12px;font-size:12px;line-height:1.6}
+@media(max-width:500px){.qrc-compare{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -55,7 +64,7 @@ input,textarea{font-family:inherit;outline:none}
 const SUPABASE_URL='https://nxnlnmiccmhtmmphfcet.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54bmxubWljY21odG1tcGhmY2V0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNzk0NzgsImV4cCI6MjA4OTc1NTQ3OH0.mDBh5WDTDLIKCQNz9Od5dQiA6vrDVT8TASrMrMxQfao';
 let sb;
-try{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}catch(e){console.error('Supabase SDK not loaded:',e);sb=null}
+try{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,storageKey:'dec-rev-auth',storage:window.localStorage}})}catch(e){console.error('Supabase SDK not loaded:',e);sb=null}
 
 // ============================================================
 // QUESTIONS — v3 (30) + v4 (85) + v5 (50) + v6 (50) + v7 (315) = 520 total
@@ -1111,7 +1120,7 @@ function checkKeywords(input,keywords){
 // ============================================================
 let S={
   v:'loading',user:null,cards:{},exams:[],
-  flt:{prof:'all',th:'all'},cur:null,showAns:false,qrcIn:'',shuffled:null,showHelp:false,
+  flt:{prof:'all',th:'all'},cur:null,showAns:false,qrcIn:'',shuffled:null,showHelp:false,flashMode:'all',
   eQs:null,eAns:{},eIdx:0,tmr:3600,eDone:false,eMode:'mixed',eShuffles:{},eShowHelp:{},
   am:'login',ae:'',ap:'',aErr:'',aLoad:false,
   sv:'',ti:null
@@ -1183,12 +1192,30 @@ function getFiltered(){
 }
 function getDue(){
   const now=Date.now();
-  return getFiltered().filter(q=>{const s=S.cards[q.id];return!s||s.next<=now});
+  let pool=getFiltered().filter(q=>{const s=S.cards[q.id];return!s||s.next<=now});
+  if(S.flashMode==='qcm')pool=pool.filter(q=>q.ty==='qcm');
+  else if(S.flashMode==='qrc')pool=pool.filter(q=>q.ty==='qrc');
+  return pool;
 }
 function pickN(){
   const d=getDue();if(!d.length){set({cur:null,showAns:false,qrcIn:'',shuffled:null,showHelp:false});return}
   const q=d[Math.floor(Math.random()*d.length)];
   set({cur:q,showAns:false,qrcIn:'',shuffled:shuffleChoices(q),showHelp:false});
+}
+
+function startAnnale(session){
+  const sessionMap={'Mai 2021':'DEC Mai 2021','Nov 2021':'DEC Nov 2021','Mai 2022':'DEC Mai 2022','Nov 2022':'DEC Nov 2022','Mai 2023':'DEC Mai 2023','Nov 2023':'DEC Nov 2023','Mai 2024':'DEC Mai 2024','Nov 2024':'DEC Nov 2024','Mai 2025':'DEC Mai 2025','Nov 2025':'DEC Nov 2025'};
+  const key=sessionMap[session]||session;
+  const annaleQs=QS.filter(q=>(q.sr||'').includes(key));
+  if(!annaleQs.length){alert('Pas de questions pour cette session');return}
+  const ec=annaleQs.filter(q=>q.p==='EC').slice(0,10);
+  const cac=annaleQs.filter(q=>q.p==='CAC').slice(0,10);
+  const examQs=[...ec,...cac];
+  const eShuffles={};
+  examQs.forEach(q=>{eShuffles[q.id]=shuffleChoices(q)});
+  if(S.ti)clearInterval(S.ti);
+  const ti=setInterval(()=>{S.tmr--;if(S.tmr<=0){clearInterval(ti);finishE()}R()},1000);
+  set({eQs:examQs,eAns:{},eIdx:0,tmr:3600,eDone:false,eMode:'annale',eShuffles,eShowHelp:{},v:'exam',ti});
 }
 function rate(quality){
   if(!S.cur)return;
@@ -1244,18 +1271,24 @@ const themes=[...new Set(QS.map(q=>q.th))];
 // ============================================================
 // RENDER
 // ============================================================
+// Theme init from localStorage
+if(localStorage.getItem('dec-theme')==='light')document.body.classList.add('light');
+function toggleTheme(){document.body.classList.toggle('light');localStorage.setItem('dec-theme',document.body.classList.contains('light')?'light':'dark')}
+function themeBtn(){return`<button class="theme-toggle" onclick="toggleTheme()">${document.body.classList.contains('light')?'🌙':'☀️'}</button>`}
+
 function R(){
   const $=document.getElementById('app');
 
-  if(S.v==='loading'){$.innerHTML=`<div class="ctn" style="display:flex;align-items:center;justify-content:center;min-height:100dvh"><div style="text-align:center"><div style="font-size:32px;margin-bottom:12px">📚</div><div style="font-size:14px;color:var(--mu)">Chargement...</div></div></div>`;return}
+  if(S.v==='loading'){$.innerHTML=`${themeBtn()}<div class="ctn" style="display:flex;align-items:center;justify-content:center;min-height:100dvh"><div style="text-align:center"><div style="font-size:32px;margin-bottom:12px">📚</div><div style="font-size:14px;color:var(--mu)">Chargement...</div></div></div>`;return}
 
   if(S.v==='auth'){
     const il=S.am==='login';
-    $.innerHTML=`<div class="ctn" style="display:flex;flex-direction:column;justify-content:center;min-height:100dvh">
-      <div style="text-align:center;margin-bottom:32px"><div style="font-size:12px;font-weight:500;letter-spacing:3px;color:var(--dm);text-transform:uppercase;margin-bottom:8px">DEC — Mai 2026</div><h1 style="font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--b2),#a78bfa,var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Révisions <span class="v4badge">v5</span></h1><div style="font-size:11px;color:var(--dm);margin-top:6px">${QS.length} questions • UE1 + UE2</div></div>
+    $.innerHTML=`${themeBtn()}<div class="ctn" style="display:flex;flex-direction:column;justify-content:center;min-height:100dvh">
+      <div style="text-align:center;margin-bottom:32px"><div style="font-size:12px;font-weight:500;letter-spacing:3px;color:var(--dm);text-transform:uppercase;margin-bottom:8px">ÉPREUVE N°1</div><h1 style="font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--b2),#a78bfa,var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent">DEC Révisions</h1><div style="font-size:11px;color:var(--dm);margin-top:6px">${QS.length} questions • EC + CAC</div></div>
       <div class="cd" style="padding:24px"><h2 style="font-size:18px;font-weight:700;margin-bottom:20px;text-align:center">${il?'Connexion':'Inscription'}</h2>
       <input class="fi" type="email" placeholder="Email" value="${S.ae}" style="margin-bottom:10px" id="ae">
-      <input class="fi" type="password" placeholder="Mot de passe${il?'':' (min. 6 car.)'}" style="margin-bottom:16px" id="ap">
+      <div style="position:relative"><input class="fi" type="password" placeholder="Mot de passe${il?'':' (min. 6 car.)'}" style="margin-bottom:16px;padding-right:44px" id="ap">
+      <button style="position:absolute;right:12px;top:12px;background:none;border:none;color:var(--dm);font-size:16px;cursor:pointer" id="ptg">👁</button></div>
       ${S.aErr?`<div style="color:var(--rd);font-size:12px;margin-bottom:12px">${S.aErr}</div>`:''}
       <button class="bt bt1" id="as" ${S.aLoad?'disabled':''}>${S.aLoad?'...':il?'Se connecter':'S\'inscrire'}</button>
       <div style="text-align:center;margin-top:16px"><button style="background:none;border:none;color:var(--b2);font-size:13px;text-decoration:underline;cursor:pointer" id="at">${il?'Créer un compte':'Déjà inscrit ?'}</button></div></div></div>`;
@@ -1264,33 +1297,48 @@ function R(){
     document.getElementById('as').addEventListener('click',doAuth);
     document.getElementById('ap').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()});
     document.getElementById('at').addEventListener('click',()=>set({am:il?'signup':'login',aErr:''}));
+    document.getElementById('ptg').addEventListener('click',()=>{const p=document.getElementById('ap');p.type=p.type==='password'?'text':'password'});
     return;
   }
 
   if(S.v==='home'){
     const st=getStats(),due=getDue().length,el=S.exams.slice(-6);
-    $.innerHTML=`<div class="ctn">
-      <div style="text-align:center;margin-bottom:24px"><div style="font-size:11px;letter-spacing:3px;color:var(--dm);text-transform:uppercase;margin-bottom:4px">UE1 Déontologie • UE2</div><h1 style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--b2),#a78bfa,var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent">DEC Révisions <span class="v4badge">v5</span></h1><div style="font-size:11px;color:var(--mu);margin-top:3px">${S.user?.email||''} ${S.sv?`<span style="color:var(--gn)">${S.sv}</span>`:''}</div></div>
+    const thStats=themes.map(th=>{const qs_=QS.filter(q=>q.th===th);const done=qs_.filter(q=>{const c=S.cards[q.id];return c&&c.last>=2}).length;return{th,total:qs_.length,done,pct:qs_.length?Math.round(done/qs_.length*100):0}});
+    const annaleSessions=['Mai 2021','Nov 2021','Mai 2022','Nov 2022','Mai 2023','Nov 2023','Mai 2024','Nov 2024','Mai 2025','Nov 2025'];
+    $.innerHTML=`${themeBtn()}<div class="ctn">
+      <div style="text-align:center;margin-bottom:24px"><div style="font-size:11px;letter-spacing:3px;color:var(--dm);text-transform:uppercase;margin-bottom:4px">ÉPREUVE N°1 — Déontologie</div><h1 style="font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--b2),#a78bfa,var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent">DEC Révisions</h1><div style="font-size:11px;color:var(--mu);margin-top:3px">${S.user?.email||''} ${S.sv?`<span style="color:var(--gn)">${S.sv}</span>`:''}</div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">${[{l:'Nouvelles',v:st.new_,c:'var(--bl)',b:'rgba(59,130,246,.12)'},{l:'En cours',v:st.learn,c:'var(--yl)',b:'rgba(245,158,11,.12)'},{l:'Maîtrisées',v:st.mas,c:'var(--gn)',b:'rgba(16,185,129,.12)'}].map(s=>`<div style="background:${s.b};border-radius:14px;padding:13px;text-align:center"><div class="mn" style="font-size:26px;font-weight:700;color:${s.c}">${s.v}</div><div style="font-size:10px;color:var(--mu)">${s.l}</div></div>`).join('')}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">${['EC','CAC'].map(p=>{const d=st.bp[p],pc=d.t?Math.round(d.c/d.t*100):0;return`<div class="cd" style="padding:12px 14px"><div style="font-size:12px;font-weight:600;color:${p==='EC'?'var(--b2)':'var(--gd)'};margin-bottom:6px">${p==='EC'?'Expert-Comptable':'Commissaire aux Comptes'}</div><div class="pb"><div class="pf" style="width:${pc}%;background:${p==='EC'?'var(--bl)':'var(--yl)'}"></div></div><div style="font-size:11px;color:var(--dm);margin-top:4px">${pc}% • ${d.c}/${d.t}</div></div>`}).join('')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">${['EC','CAC'].map(p=>{const d=st.bp[p],pc=d.t?Math.round(d.c/d.t*100):0;return`<div class="cd" style="padding:12px 14px"><div style="font-size:12px;font-weight:600;color:${p==='EC'?'var(--b2)':'var(--gd)'};margin-bottom:6px">${p==='EC'?'Expert-Comptable':'Commissaire aux Comptes'}</div><div class="pb"><div class="pf" style="width:${pc}%;background:${p==='EC'?'var(--bl)':'var(--yl)'}"></div></div><div style="font-size:11px;color:var(--dm);margin-top:4px">${pc}% • ${d.c}/${d.t}</div></div>`}).join('')}</div>
+      <div class="cd" style="padding:12px 14px;margin-bottom:18px"><div style="font-size:10px;font-weight:600;color:var(--mu);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Progression par thème</div>${thStats.map(t=>`<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span style="color:var(--tx)">${t.th}</span><span style="color:var(--dm)">${t.pct}% (${t.done}/${t.total})</span></div><div class="pb" style="height:4px"><div class="pf" style="width:${t.pct}%;background:linear-gradient(90deg,var(--bl),var(--pu))"></div></div></div>`).join('')}</div>
       ${el.length?`<div class="cd" style="padding:14px;margin-bottom:18px"><div style="font-size:11px;font-weight:600;color:var(--mu);margin-bottom:8px">📈 Examens (${S.exams.length})</div><div style="display:flex;align-items:end;gap:5px;height:50px">${el.map(e=>{const h=Math.max(6,e.score_total/20*46),c=e.score_total>=14?'var(--gn)':e.score_total>=10?'var(--yl)':'var(--rd)';return`<div style="flex:1;text-align:center"><div class="mn" style="font-size:8px;font-weight:600;color:${c}">${e.score_total}</div><div style="width:100%;height:${h}px;background:${c}33;border-radius:3px;border:1px solid ${c}55"></div><div style="font-size:7px;color:var(--dm)">${fmtD(e.created_at)}</div></div>`}).join('')}</div></div>`:''}
       <div style="display:flex;flex-direction:column;gap:9px">
-        <button class="bt bt1" id="bf">📚 Flashcards — ${due} carte${due>1?'s':''}</button>
+        <div style="font-size:12px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">📚 Entraînement Flashcards</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-          <button class="bt bt2" style="font-size:12px;padding:12px 8px" data-em="mixed">🎯 Mixte</button>
+          <button class="bt bt1" style="font-size:12px;padding:13px 8px" id="bf-mix">Mixte</button>
+          <button class="bt" style="font-size:12px;padding:13px 8px;background:linear-gradient(135deg,var(--gn),#059669);color:#fff" id="bf-qcm">QCM</button>
+          <button class="bt" style="font-size:12px;padding:13px 8px;background:linear-gradient(135deg,#a855f7,var(--pu));color:#fff" id="bf-qrc">QRC</button>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:10px;margin-bottom:2px">🎯 Examen blanc (1h — 20 questions)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <button class="bt bt2" style="font-size:12px;padding:12px 8px" data-em="mixed">Mixte</button>
           <button class="bt bt2" style="font-size:12px;padding:12px 8px;background:linear-gradient(135deg,var(--gn),#059669)" data-em="qcm">QCM seul</button>
           <button class="bt bt2" style="font-size:12px;padding:12px 8px;background:linear-gradient(135deg,#a855f7,var(--pu))" data-em="qrc">QRC seul</button>
         </div>
-        <button class="bt bt3" style="font-size:12px;padding:10px;opacity:.5" id="bl">Déconnexion</button>
+        <div style="font-size:12px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-top:10px;margin-bottom:2px">📝 Annales DEC (sessions réelles)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${annaleSessions.map(s=>`<button class="bt bt3" style="font-size:11px;padding:9px 8px" data-an="${s}">${s}</button>`).join('')}</div>
+        <button class="bt bt3" style="font-size:12px;padding:10px;opacity:.5;margin-top:6px" id="bl">Déconnexion</button>
       </div>
       <div style="margin-top:14px">
         <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap">${['all','EC','CAC'].map(f=>`<button style="padding:5px 12px;border-radius:20px;border:${S.flt.prof===f?'1px solid var(--b2)':'1px solid var(--bd)'};background:${S.flt.prof===f?'rgba(96,165,250,.15)':'transparent'};color:${S.flt.prof===f?'var(--b2)':'var(--mu)'};font-size:11px;font-weight:500" data-f="${f}">${f==='all'?'Toutes':f}</button>`).join('')}</div>
         <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:8px">${['all',...themes].map(t=>`<button style="padding:3px 9px;border-radius:14px;border:${S.flt.th===t?'1px solid #a855f7':'1px solid var(--bd)'};background:${S.flt.th===t?'rgba(168,85,247,.12)':'transparent'};color:${S.flt.th===t?'#a855f7':'var(--dm)'};font-size:10px;font-weight:500" data-th="${t}">${t==='all'?'Tous thèmes':t}</button>`).join('')}</div>
       </div>
-      <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--dm)">${QS.length} questions • ${QS.filter(q=>q.ty==='qcm').length} QCM • ${QS.filter(q=>q.ty==='qrc').length} QRC</div>
+      <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--dm)">${getFiltered().length} questions filtrées • ${QS.filter(q=>q.ty==='qcm').length} QCM • ${QS.filter(q=>q.ty==='qrc').length} QRC</div>
     </div>`;
-    document.getElementById('bf').addEventListener('click',()=>{pickN();set({v:'flashcard'})});
+    document.getElementById('bf-mix').addEventListener('click',()=>{S.flashMode='all';pickN();set({v:'flashcard'})});
+    document.getElementById('bf-qcm').addEventListener('click',()=>{S.flashMode='qcm';pickN();set({v:'flashcard'})});
+    document.getElementById('bf-qrc').addEventListener('click',()=>{S.flashMode='qrc';pickN();set({v:'flashcard'})});
     document.querySelectorAll('[data-em]').forEach(b=>b.addEventListener('click',()=>startExam(b.dataset.em)));
+    document.querySelectorAll('[data-an]').forEach(b=>b.addEventListener('click',()=>startAnnale(b.dataset.an)));
     document.getElementById('bl').addEventListener('click',logout);
     document.querySelectorAll('[data-f]').forEach(b=>b.addEventListener('click',()=>set({flt:{...S.flt,prof:b.dataset.f}})));
     document.querySelectorAll('[data-th]').forEach(b=>b.addEventListener('click',()=>set({flt:{...S.flt,th:b.dataset.th}})));
@@ -1303,7 +1351,7 @@ function R(){
     let html='';
     if(!S.showAns){
       if(q.ty==='qcm'){
-        html=`<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">${sh.choices.map((c,i)=>`<button class="ch" data-sw="1"><span style="font-weight:600;color:var(--dm);margin-right:7px">${String.fromCharCode(65+i)})</span>${c}</button>`).join('')}</div>`;
+        html=`<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">${sh.choices.map((c,i)=>`<button class="ch" data-ci="${i}"><span style="font-weight:600;color:var(--dm);margin-right:7px">${String.fromCharCode(65+i)})</span>${c}</button>`).join('')}</div>`;
       }else{
         html=`<textarea class="fi" id="qi" placeholder="Rédigez votre réponse..." style="min-height:90px;resize:vertical;margin-bottom:8px">${S.qrcIn}</textarea>
         ${!S.showHelp&&q.tip?`<button class="help-btn" id="hb">💡 Besoin d'aide ?</button>`:''}
@@ -1313,23 +1361,40 @@ function R(){
     }else{
       let choicesHtml='';
       if(q.ty==='qcm'){
-        choicesHtml=sh.choices.map((c,i)=>`<div class="ch${i===sh.correctIdx?' ok':''}" style="cursor:default;margin-bottom:3px"><span style="margin-right:7px">${String.fromCharCode(65+i)})</span>${c}${i===sh.correctIdx?' ✓':''}</div>`).join('');
+        const userPick=S.flashPick;
+        const isCorrect=userPick===sh.correctIdx;
+        choicesHtml=sh.choices.map((c,i)=>{
+          let cls='ch';
+          if(i===sh.correctIdx)cls+=' ok';
+          else if(i===userPick&&!isCorrect)cls+=' wrong';
+          return`<div class="${cls}" style="cursor:default;margin-bottom:3px"><span style="margin-right:7px">${String.fromCharCode(65+i)})</span>${c}${i===sh.correctIdx?' ✓':''}${i===userPick&&!isCorrect?' ✗':''}</div>`;
+        }).join('');
       }
       let kwHtml='';
       if(q.ty==='qrc'&&q.kw){
         const{found,missing,score}=checkKeywords(S.qrcIn,q.kw);
-        kwHtml=`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--mu);margin-bottom:6px">MOTS-CLÉS (${Math.round(score*100)}%)</div><div>${found.map(k=>`<span class="kw kw-ok">✓ ${k}</span>`).join('')}${missing.map(k=>`<span class="kw kw-miss">✗ ${k}</span>`).join('')}</div></div>`;
+        kwHtml=`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--mu);margin-bottom:6px">MOTS-CLÉS IDENTIFIÉS (${Math.round(score*100)}%)</div><div>${found.map(k=>`<span class="kw kw-ok">✓ ${k}</span>`).join('')}${missing.map(k=>`<span class="kw kw-miss">✗ ${k}</span>`).join('')}</div></div>`;
+      }
+      let qrcCompare='';
+      if(q.ty==='qrc'){
+        qrcCompare=`<div class="qrc-compare">${S.qrcIn?`<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.15)"><div style="font-size:10px;font-weight:600;color:var(--b2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Votre réponse</div><p style="color:var(--ans-tx)">${S.qrcIn.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p></div>`:'<div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:11px;padding:12px"><div style="font-size:10px;font-weight:600;color:var(--rd)">Pas de réponse saisie</div></div>'}
+        <div style="background:var(--ans-bg);border:1px solid var(--ans-bd)"><div style="font-size:10px;font-weight:600;color:var(--gn);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Réponse modèle</div><p style="color:var(--ans-tx)">${q.a}</p></div></div>`;
+      }
+      let tipHtml='';
+      if(q.ty==='qrc'&&q.tip){
+        tipHtml=`<div class="tip" style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:#a78bfa;margin-bottom:4px">💡 Conseil pour la prochaine fois</div><div style="font-size:12px;color:var(--ans-tx);line-height:1.5">${q.tip}</div></div>`;
       }
       html=`<div class="fade">${choicesHtml?`<div style="margin-bottom:10px">${choicesHtml}</div>`:''}${kwHtml}
-        <div class="answer-box" style="background:rgba(16,185,129,.08);border-radius:13px;padding:16px;border:1px solid rgba(16,185,129,.15);margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:var(--gn);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">${q.ty==='qrc'?'Réponse attendue':'Explication'}</div><p style="font-size:13px;line-height:1.6;color:#d1d5db">${q.ty==='qcm'?q.ex:q.a}</p></div>
+        ${q.ty==='qrc'?qrcCompare:`<div class="answer-box" style="background:var(--ans-bg);border-radius:13px;padding:16px;border:1px solid var(--ans-bd);margin-bottom:10px"><div style="font-size:10px;font-weight:600;color:var(--gn);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Explication</div><p style="font-size:13px;line-height:1.6;color:var(--ans-tx)">${q.ex}</p></div>`}
+        ${tipHtml}
         <div style="font-size:11px;color:var(--dm);margin-bottom:16px">📖 ${q.sr}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px">${[{l:'À revoir',s:'<1j',c:'var(--rd)',q:0},{l:'Difficile',s:'1j',c:'var(--yl)',q:1},{l:'Bien',s:'3j',c:'var(--bl)',q:2},{l:'Facile',s:'7j+',c:'var(--gn)',q:3}].map(b=>`<button style="padding:13px 6px;border-radius:11px;border:1px solid ${b.c}33;background:${b.c}1a;color:${b.c};font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;cursor:pointer;font-family:inherit" data-rt="${b.q}">${b.l}<span style="font-size:9px;opacity:.7">${b.s}</span></button>`).join('')}</div></div>`;
     }
-    $.innerHTML=`<div class="ctn"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><button style="background:none;color:var(--mu);font-size:13px;cursor:pointer;font-family:inherit" id="bk">← Retour</button><div style="font-size:11px;color:var(--dm)">${due.length} restante${due.length>1?'s':''}</div></div>
+    $.innerHTML=`${themeBtn()}<div class="ctn"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><button style="background:none;color:var(--mu);font-size:13px;cursor:pointer;font-family:inherit" id="bk">← Retour</button><div style="font-size:11px;color:var(--dm)">${due.length} restante${due.length>1?'s':''}</div></div>
     <div style="display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap"><span class="tg tg-${q.p.toLowerCase()}">${q.p}</span><span class="tg" style="background:rgba(255,255,255,.06);color:var(--mu)">${q.th}</span><span class="tg tg-${q.ty}">${q.ty.toUpperCase()}</span></div>
     <div class="cd" style="margin-bottom:14px"><p style="font-size:16px;font-weight:500;line-height:1.5">${q.q}</p></div>${html}</div>`;
     document.getElementById('bk')?.addEventListener('click',()=>set({v:'home'}));
-    document.querySelectorAll('[data-sw]').forEach(b=>b.addEventListener('click',()=>set({showAns:true})));
+    document.querySelectorAll('[data-ci]').forEach(b=>b.addEventListener('click',()=>{S.flashPick=parseInt(b.dataset.ci);set({showAns:true})}));
     document.getElementById('bs')?.addEventListener('click',()=>set({showAns:true}));
     document.getElementById('hb')?.addEventListener('click',()=>set({showHelp:true}));
     document.getElementById('qi')?.addEventListener('input',e=>S.qrcIn=e.target.value);
